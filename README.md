@@ -1,3 +1,5 @@
+This is a fork of https://github.com/SergeyMosin/Appointments
+
 # Appointments App | NextCloud
 
 ### Notice: Support for floating timezones is being phased-out

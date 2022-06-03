@@ -20,6 +20,8 @@ use Sabre\VObject\Reader;
 use OCP\Activity\IManager as IActivityManager;
 use OCP\IURLGenerator;
 use DateTime;
+use OCA\Adminly_Clients\Db\ClientMapper;
+use OCA\Adminly_Clients\Db\Client;
 
 class DavListener implements IEventListener
 {
@@ -32,18 +34,22 @@ class DavListener implements IEventListener
     protected $activityManager;
     /** @var IURLGenerator */
     protected $url;
+    /** @var ClientMapper */
+	private $mapper;
 
     public function __construct(\OCP\IL10N      $l10N,
                                 LoggerInterface $logger,
                                 BackendUtils    $utils,
 								IActivityManager $activityManager,
-								IURLGenerator $url) {
+								IURLGenerator $url,
+                                ClientMapper $mapper) {
         $this->appName = Application::APP_ID;
         $this->l10N = $l10N;
         $this->logger = $logger;
         $this->utils = $utils;
         $this->activityManager = $activityManager;
         $this->url = $url;
+		$this->mapper = $mapper;
     }
 
     function handle(Event $event): void {
@@ -603,7 +609,18 @@ class DavListener implements IEventListener
             if ($eml_settings[BackendUtils::EML_MCONF]) {
                 $om_prefix = $this->l10N->t("Appointment confirmed");
             }
+            
+            // create client 
+          
+            $client = new Client();
+            $client->setName($to_name);
+            $client->setEmail($to_email);
+            $client->setProviderId($userId);
 
+            $this->mapper->insert($client);
+            
+            // end create client 
+     
             $ext_event_type = 0;
 
         } elseif ($hint === BackendUtils::APPT_SES_CANCEL || $isDelete) {

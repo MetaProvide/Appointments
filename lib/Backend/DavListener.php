@@ -617,8 +617,10 @@ class DavListener implements IEventListener
             $client->setEmail($to_email);
             $client->setProviderId($userId);
 
-            $this->mapper->insert($client);
+            $newClient = $this->mapper->insert($client);
             
+            $this->publishClientActivity($newClient, $userId);
+
             // end create client 
      
             $ext_event_type = 0;
@@ -815,7 +817,7 @@ class DavListener implements IEventListener
 
         $object['link'] = $this->url->linkToRouteAbsolute('calendar.view.indexview.timerange.edit', $link);
 
-        $this->publishActivity($hint, $object, $userId);
+        $this->publishBookingActivity($hint, $object, $userId);
 
         ///-------------------
 
@@ -1211,7 +1213,7 @@ class DavListener implements IEventListener
         $tmpl->addFooter("Booked via Nextcloud Appointments App");
 
     }
-    function publishActivity($hint, array $object, $userId) {
+    function publishBookingActivity($hint, array $object, $userId) {
 		
         switch ($hint) {
             case BackendUtils::APPT_SES_BOOK:
@@ -1322,6 +1324,27 @@ class DavListener implements IEventListener
             $ret = $da[1];
         }
         return $ret;
+    }
+
+    function publishClientActivity($client, $userId) {
+
+		$event = $this->activityManager->generateEvent();
+			$event->setApp('adminly_clients')
+				->setObject('client', $client->getId())
+				->setType('clients')
+				->setAffectedUser($userId)
+				->setSubject(
+					"client_add",
+					[
+						'client' => [
+							'type' => 'addressbook-contact',
+							'id' => $client->getId(),
+							'name' => $client->getName()
+						],
+					]
+				);
+
+			$this->activityManager->publish($event);
     }
 
 }

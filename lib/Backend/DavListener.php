@@ -616,6 +616,8 @@ class DavListener implements IEventListener
             $client->setName($to_name);
             $client->setEmail($to_email);
             $client->setProviderId($userId);
+            $client->setDescription(" ");
+            $client->setPhoneNumber( $this->getPhoneFromDescription($om_info));
 
             $newClient = $this->mapper->insert($client);
             

@@ -621,9 +621,10 @@ class DavListener implements IEventListener
 
             $newClient = $this->mapper->insert($client);
             
+            //publish the new client actitivty
             $this->publishClientActivity($newClient, $userId);
 
-            // end create client 
+            // ----------------------
      
             $ext_event_type = 0;
 

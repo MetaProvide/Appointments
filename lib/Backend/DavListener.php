@@ -562,6 +562,26 @@ class DavListener implements IEventListener
                 $om_prefix = $this->l10N->t("Appointment pending");
             }
 
+            // create client 
+            try{
+                $client = new Client();
+                $client->setName($to_name);
+                $client->setEmail($to_email);
+                $client->setProviderId($userId);
+                $client->setDescription(" ");
+                $client->setPhoneNumber( $this->getPhoneFromDescription($om_info));
+                $client->setTimezone($this->getTimezoneFromDescription($om_info));
+
+                $newClient = $this->mapper->insert($client);
+                
+                //publish the new client actitivty
+                $this->publishClientActivity($newClient, $userId);
+            }
+            catch(Exception $e){
+                $this->logger->error($e->getMessage());
+            }
+            // ----------------------
+
         } elseif ($hint === BackendUtils::APPT_SES_CONFIRM) {
             // Confirm link in the email is clicked ...
             // ... or the email validation step is skipped
@@ -609,23 +629,7 @@ class DavListener implements IEventListener
             if ($eml_settings[BackendUtils::EML_MCONF]) {
                 $om_prefix = $this->l10N->t("Appointment confirmed");
             }
-            
-            // create client 
-          
-            $client = new Client();
-            $client->setName($to_name);
-            $client->setEmail($to_email);
-            $client->setProviderId($userId);
-            $client->setDescription(" ");
-            $client->setPhoneNumber( $this->getPhoneFromDescription($om_info));
-
-            $newClient = $this->mapper->insert($client);
-            
-            //publish the new client actitivty
-            $this->publishClientActivity($newClient, $userId);
-
-            // ----------------------
-     
+                 
             $ext_event_type = 0;
 
         } elseif ($hint === BackendUtils::APPT_SES_CANCEL || $isDelete) {
@@ -1327,6 +1331,18 @@ class DavListener implements IEventListener
             $ret = $da[1];
         }
         return $ret;
+    }
+
+    private function getTimezoneFromDescription(string $description): string {
+        $timezone = "";
+
+        preg_match_all("/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i", $description, $matches);
+        $email = $matches[0][0];
+
+        $arr = explode($email, $description);
+        $timezone = str_replace("\n","",$arr[1]);
+
+        return $timezone;
     }
 
     function publishClientActivity($client, $userId) {

@@ -568,7 +568,7 @@ class DavListener implements IEventListener
                 $client->setName($to_name);
                 $client->setEmail($to_email);
                 $client->setProviderId($userId);
-                $client->setDescription(" ");
+                $client->setDescription("");
                 $client->setPhoneNumber( $this->getPhoneFromDescription($om_info));
                 $client->setTimezone($this->getTimezoneFromDescription($om_info));
 
@@ -578,7 +578,8 @@ class DavListener implements IEventListener
                 $this->publishClientActivity($newClient, $userId);
             }
             catch(Exception $e){
-                $this->logger->error($e->getMessage());
+                if($e->getCode() != 1062) // ignores duplicate email exception
+                    $this->logger->error($e->getMessage());
             }
             // ----------------------
 
@@ -629,7 +630,6 @@ class DavListener implements IEventListener
             if ($eml_settings[BackendUtils::EML_MCONF]) {
                 $om_prefix = $this->l10N->t("Appointment confirmed");
             }
-                 
             $ext_event_type = 0;
 
         } elseif ($hint === BackendUtils::APPT_SES_CANCEL || $isDelete) {
@@ -1346,7 +1346,6 @@ class DavListener implements IEventListener
     }
 
     function publishClientActivity($client, $userId) {
-
 		$event = $this->activityManager->generateEvent();
 			$event->setApp('adminly_clients')
 				->setObject('client', $client->getId())

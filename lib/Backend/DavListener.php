@@ -20,6 +20,8 @@ use Sabre\VObject\Reader;
 use OCP\Activity\IManager as IActivityManager;
 use OCP\IURLGenerator;
 use DateTime;
+use OCA\Adminly_Clients\Db\ClientMapper;
+use OCA\Adminly_Clients\Db\Client;
 
 class DavListener implements IEventListener
 {
@@ -32,18 +34,22 @@ class DavListener implements IEventListener
     protected $activityManager;
     /** @var IURLGenerator */
     protected $url;
+    /** @var ClientMapper */
+	private $mapper;
 
     public function __construct(\OCP\IL10N      $l10N,
                                 LoggerInterface $logger,
                                 BackendUtils    $utils,
 								IActivityManager $activityManager,
-								IURLGenerator $url) {
+								IURLGenerator $url,
+                                ClientMapper $mapper) {
         $this->appName = Application::APP_ID;
         $this->l10N = $l10N;
         $this->logger = $logger;
         $this->utils = $utils;
         $this->activityManager = $activityManager;
         $this->url = $url;
+		$this->mapper = $mapper;
     }
 
     function handle(Event $event): void {
@@ -556,6 +562,27 @@ class DavListener implements IEventListener
                 $om_prefix = $this->l10N->t("Appointment pending");
             }
 
+            // create client 
+            try{
+                $client = new Client();
+                $client->setName($to_name);
+                $client->setEmail($to_email);
+                $client->setProviderId($userId);
+                $client->setDescription("");
+                $client->setPhoneNumber( $this->getPhoneFromDescription($om_info));
+                $client->setTimezone($this->getTimezoneFromDescription($om_info));
+
+                $newClient = $this->mapper->insert($client);
+                
+                //publish the new client actitivty
+                $this->publishClientActivity($newClient, $userId);
+            }
+            catch(Exception $e){
+                if($e->getCode() != 1062) // ignores duplicate email exception
+                    $this->logger->error($e->getMessage());
+            }
+            // ----------------------
+
         } elseif ($hint === BackendUtils::APPT_SES_CONFIRM) {
             // Confirm link in the email is clicked ...
             // ... or the email validation step is skipped
@@ -603,7 +630,6 @@ class DavListener implements IEventListener
             if ($eml_settings[BackendUtils::EML_MCONF]) {
                 $om_prefix = $this->l10N->t("Appointment confirmed");
             }
-
             $ext_event_type = 0;
 
         } elseif ($hint === BackendUtils::APPT_SES_CANCEL || $isDelete) {
@@ -798,7 +824,7 @@ class DavListener implements IEventListener
 
         $object['link'] = $this->url->linkToRouteAbsolute('calendar.view.indexview.timerange.edit', $link);
 
-        $this->publishActivity($hint, $object, $userId);
+        $this->publishBookingActivity($hint, $object, $userId);
 
         ///-------------------
 
@@ -1194,7 +1220,7 @@ class DavListener implements IEventListener
         $tmpl->addFooter("Booked via Nextcloud Appointments App");
 
     }
-    function publishActivity($hint, array $object, $userId) {
+    function publishBookingActivity($hint, array $object, $userId) {
 		
         switch ($hint) {
             case BackendUtils::APPT_SES_BOOK:
@@ -1305,6 +1331,38 @@ class DavListener implements IEventListener
             $ret = $da[1];
         }
         return $ret;
+    }
+
+    private function getTimezoneFromDescription(string $description): string {
+        $timezone = "";
+
+        preg_match_all("/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i", $description, $matches);
+        $email = $matches[0][0];
+
+        $arr = explode($email, $description);
+        $timezone = str_replace("\n","",$arr[1]);
+
+        return $timezone;
+    }
+
+    function publishClientActivity($client, $userId) {
+		$event = $this->activityManager->generateEvent();
+			$event->setApp('adminly_clients')
+				->setObject('client', $client->getId())
+				->setType('clients')
+				->setAffectedUser($userId)
+				->setSubject(
+					"client_add",
+					[
+						'client' => [
+							'type' => 'addressbook-contact',
+							'id' => $client->getId(),
+							'name' => $client->getName()
+						],
+					]
+				);
+
+			$this->activityManager->publish($event);
     }
 
 }

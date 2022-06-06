@@ -284,7 +284,7 @@ class BackendUtils
         }
         $evt->SUMMARY->setValue("⌛ " . $info['name']);
 
-        $dsr = $info['name'] . "\n" . (empty($info['phone']) ? "" : ($info['phone'] . "\n")) . $info['email'] . $info['_more_data'];
+        $dsr = $info['name'] . "\n" . (empty($info['phone']) ? "" : ($info['phone'] . "\n")) . $info['email'] . (empty($info['tzi']) ? "" : "\n" .(substr($info['tzi'] , 1)))  . $info['_more_data'];
 
         if (isset($info["_more_ics_text"])) {
             // custom ICS text from per settings

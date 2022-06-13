@@ -42,6 +42,7 @@
         <navigation>
             <name>Appointments</name>
             <route>appointments.page.index</route>
+            <icon>adminly_appointments.svg</icon>
         </navigation>
     </navigations>
 	<activity>

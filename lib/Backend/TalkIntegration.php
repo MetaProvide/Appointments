@@ -111,16 +111,16 @@ class TalkIntegration
 
     /**
      * @param Room $room
-     * @param \DateTime $dateTime
+     * @param int|null $timer
      */
-    function setLobby(Room $room, \DateTime $dateTime) {
+    function setLobby(Room $room, ?int $timer = null) {
         // $room->setLobby wants utc timezone ?!?
         // @see OCA\Talk\Controller\WebinarController->setLobby
-//        $_dt=new \DateTime(null,new \DateTimeZone('UTC'));
-//        $_dt->setTimestamp($dateTime->getTimestamp());
+        // $_dt=new \DateTime(null,new \DateTimeZone('UTC'));
+        // $_dt->setTimestamp($dateTime->getTimestamp());
         // Lets not do timer for now..., davListener needs update if this is implemented
 
-        $room->setLobby(Webinary::LOBBY_NON_MODERATORS, null);
+        $room->setLobby(Webinary::LOBBY_NON_MODERATORS, $timer);
     }
 
     /**

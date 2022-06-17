@@ -577,23 +577,24 @@ class DavListener implements IEventListener
             }
 
             // create client 
-            try{
-                $client = new Client();
-                $client->setName($to_name);
-                $client->setEmail($to_email);
-                $client->setProviderId($userId);
-                $client->setDescription("");
-                $client->setPhoneNumber( $this->getPhoneFromDescription($om_info));
-                $client->setTimezone($this->getTimezoneFromDescription($om_info));
+            if(!$this->mapper->findByEmail($to_email, $userId)){
+                try{
+                    $client = new Client();
+                    $client->setName($to_name);
+                    $client->setEmail($to_email);
+                    $client->setProviderId($userId);
+                    $client->setDescription("");
+                    $client->setPhoneNumber( $this->getPhoneFromDescription($om_info));
+                    $client->setTimezone($this->getTimezoneFromDescription($om_info));
 
-                $newClient = $this->mapper->insert($client);
-                
-                //publish the new client actitivty
-                $this->publishClientActivity($newClient, $userId);
-            }
-            catch(Exception $e){
-                if($e->getCode() != 1062) // ignores duplicate email exception
+                    $newClient = $this->mapper->insert($client);
+                    
+                    //publish the new client actitivty
+                    $this->publishClientActivity($newClient, $userId);
+                }
+                catch(Exception $e){
                     $this->logger->error($e->getMessage());
+                }
             }
             // ----------------------
 

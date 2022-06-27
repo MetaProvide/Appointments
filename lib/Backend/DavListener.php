@@ -58,7 +58,6 @@ class DavListener implements IEventListener
         $this->l10N = $l10N;
         $this->logger = $logger;
         $this->utils = $utils;
-
         $this->mailer = \OC::$server->get(IMailer::class);
         $this->config = \OC::$server->get(IConfig::class);
         $this->activityManager = $activityManager;

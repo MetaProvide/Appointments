@@ -23,7 +23,6 @@ use OCP\Mail\IMailer;
 use Psr\Log\LoggerInterface;
 use Sabre\VObject\Reader;
 use OCP\Activity\IManager as IActivityManager;
-use OCP\IURLGenerator;
 use DateTime;
 use OCA\Adminly_Clients\Db\ClientMapper;
 use OCA\Adminly_Clients\Db\Client;

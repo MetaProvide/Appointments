@@ -4,8 +4,8 @@
 namespace OCA\Appointments\Backend;
 
 
+use OC\Mail\EMailTemplate;
 use OCA\Appointments\AppInfo\Application;
-use OCA\Appointments\Email\EMailTemplateNC;
 use OCA\Appointments\Email\EMailTemplateNC20;
 use OCA\DAV\Events\CalendarObjectMovedToTrashEvent;
 use OCA\DAV\Events\CalendarObjectUpdatedEvent;
@@ -14,11 +14,15 @@ use OCP\DB\Exception;
 use OCP\DB\QueryBuilder\IQueryBuilder;
 use OCP\EventDispatcher\Event;
 use OCP\EventDispatcher\IEventListener;
+use OCP\IConfig;
 use OCP\IDBConnection;
+use OCP\IURLGenerator;
+use OCP\L10N\IFactory;
+use OCP\Mail\IEMailTemplate;
+use OCP\Mail\IMailer;
 use Psr\Log\LoggerInterface;
 use Sabre\VObject\Reader;
 use OCP\Activity\IManager as IActivityManager;
-use OCP\IURLGenerator;
 use DateTime;
 use OCA\Adminly_Clients\Db\ClientMapper;
 use OCA\Adminly_Clients\Db\Client;
@@ -37,6 +41,12 @@ class DavListener implements IEventListener
     /** @var ClientMapper */
 	private $mapper;
 
+    /** @type IMailer */
+    private $mailer;
+
+    /** @type IConfig */
+    private $config;
+
     public function __construct(\OCP\IL10N      $l10N,
                                 LoggerInterface $logger,
                                 BackendUtils    $utils,
@@ -50,6 +60,8 @@ class DavListener implements IEventListener
         $this->activityManager = $activityManager;
         $this->url = $url;
 		$this->mapper = $mapper;
+        $this->mailer = \OC::$server->get(IMailer::class);
+        $this->config = \OC::$server->get(IConfig::class);
     }
 
     function handle(Event $event): void {
@@ -93,14 +105,14 @@ class DavListener implements IEventListener
             return;
         }
 
-        $config = \OC::$server->getConfig();
-        $mailer = \OC::$server->getMailer();
+        $config = $this->config;
+        $mailer = $this->mailer;
 
         $utils = $this->utils;
         $utz = new \DateTimeZone('utc');
 
         $userId = '';
-        $extNotifyFilePath='';
+        $extNotifyFilePath = '';
         while ($row = $result->fetch()) {
 
             $remObj = json_decode($row['reminders'], true);
@@ -285,7 +297,7 @@ class DavListener implements IEventListener
                     $msg->setTo(array($to_email));
                     $msg->useTemplate($tmpl);
 
-                    $description='';
+                    $description = '';
 
                     try {
                         $mailer->send($msg);
@@ -381,7 +393,7 @@ class DavListener implements IEventListener
 //        \OC::$server->getLogger()->error('DL Debug: M3');
 
         $utils = $this->utils;
-        $config = \OC::$server->getConfig();
+        $config = $this->config;
 
         if (isset($evt->{BackendUtils::XAD_PROP})) {
             // @see BackendUtils->dataSetAttendee for BackendUtils::XAD_PROP
@@ -489,7 +501,7 @@ class DavListener implements IEventListener
 
 //        \OC::$server->getLogger()->error('DL Debug: M10');
 
-        $mailer = \OC::$server->getMailer();
+        $mailer = $this->mailer;
 
         $att_v = $att->getValue();
         $to_email = substr($att_v, strpos($att_v, ":") + 1);
@@ -517,8 +529,8 @@ class DavListener implements IEventListener
         // Description can get overwritten when the .ics attachment is constructed, so get it here
         if (isset($evt->DESCRIPTION)) {
             $om_info = $evt->DESCRIPTION->getValue();
-        }else{
-            $om_info="";
+        } else {
+            $om_info = "";
         }
 
         // cancellation link for confirmation emails
@@ -555,7 +567,7 @@ class DavListener implements IEventListener
             );
 
             if (!empty($eml_settings[BackendUtils::EML_VLD_TXT])) {
-                $tmpl->addBodyText($eml_settings[BackendUtils::EML_VLD_TXT]);
+                $this->addMoreEmailText($tmpl, $eml_settings[BackendUtils::EML_VLD_TXT]);
             }
 
             if ($eml_settings[BackendUtils::EML_MREQ]) {
@@ -625,7 +637,7 @@ class DavListener implements IEventListener
             }
 
             if (!empty($eml_settings[BackendUtils::EML_CNF_TXT])) {
-                $tmpl->addBodyText($eml_settings[BackendUtils::EML_CNF_TXT]);
+                $this->addMoreEmailText($tmpl, $eml_settings[BackendUtils::EML_CNF_TXT]);
             }
 
             if ($eml_settings[BackendUtils::EML_MCONF]) {
@@ -855,14 +867,15 @@ class DavListener implements IEventListener
             if (!$is_cancelled) {
                 $method = 'PUBLISH';
 
-                if (empty($org_phone) && empty($talk_link_txt)) {
+                $more_ics_text = $eml_settings[BackendUtils::EML_ICS_TXT];
+
+                if (empty($org_phone) && empty($talk_link_txt) && empty($more_ics_text)) {
                     if (isset($evt->DESCRIPTION)) {
                         $evt->remove($evt->DESCRIPTION);
                     }
                 } else {
                     if (!isset($evt->DESCRIPTION)) $evt->add('DESCRIPTION');
 
-                    $more_ics_text = $eml_settings[BackendUtils::EML_ICS_TXT];
                     $evt->DESCRIPTION->setValue(
                         $org_name . "\n"
                         . (!empty($org_phone) ? $org_phone . "\n" : "")
@@ -1157,26 +1170,28 @@ class DavListener implements IEventListener
     }
 
     private function getEmailTemplate() {
-        $r = new \ReflectionMethod('OCP\Mail\IEMailTemplate', 'addBodyListItem');
-        if ($r->getNumberOfParameters() === 6) {
-            //NC20+
-            $tmpl = new EMailTemplateNC20(
+
+        $urlGenerator = \OC::$server->get(IURLGenerator::class);
+
+        // NC settings compliance
+        $class = $this->config->getSystemValue('mail_template_class', '');
+        if ($class !== '' && class_exists($class) && is_a($class, EMailTemplate::class, true)) {
+            return new $class(
                 new \OCP\Defaults(),
-                \OC::$server->getURLGenerator(),
-                $this->l10N,
-                "ID_" . time(),
-                []
-            );
-        } else {
-            $tmpl = new EMailTemplateNC(
-                new \OCP\Defaults(),
-                \OC::$server->getURLGenerator(),
-                $this->l10N,
+                $urlGenerator,
+                \OC::$server->get(IFactory::class),
                 "ID_" . time(),
                 []
             );
         }
-        return $tmpl;
+
+        return new EMailTemplateNC20(
+            new \OCP\Defaults(),
+            $urlGenerator,
+            $this->l10N,
+            "ID_" . time(),
+            []
+        );
     }
 
     private function getOrgInfo($userId, $pageId) {
@@ -1308,19 +1323,18 @@ class DavListener implements IEventListener
     private function extNotify(array $data, string $userId, string $filePath) {
 
         if ($filePath !== "") {
-            try {
-                require_once $filePath;
-            } catch (\Exception $e) {
-                $this->logger->error("Extension file '" . $filePath . "' for user '" . $userId . "' not found");
-                $this->logger->error($e);
-                return;
-            }
 
-            try {
-                notificationEventListener($data, $this->logger);
-            } catch (\Exception $e) {
-                $this->logger->error("User '" . $userId . "' extension file error: " . $e);
-                return;
+            include_once $filePath;
+
+            if (function_exists('notificationEventListener')) {
+                try {
+                    notificationEventListener($data, $this->logger);
+                } catch (\Exception $e) {
+                    $this->logger->error("User '" . $userId . "' extension file error: " . $e);
+                    return;
+                }
+            } else {
+                $this->logger->error("User '" . $userId . "' can not find 'notificationEventListener' in " . $filePath . " or the file does not exist");
             }
         }
     }
@@ -1366,4 +1380,13 @@ class DavListener implements IEventListener
 			$this->activityManager->publish($event);
     }
 
+    private function addMoreEmailText(IEMailTemplate $template, string $text) {
+        $text_striped = strip_tags($text);
+        if ($text === $text_striped) {
+            // non html
+            $template->addBodyText($text);
+        } else {
+            $template->addBodyText($text, $text);
+        }
+    }
 }

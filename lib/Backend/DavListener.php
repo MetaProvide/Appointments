@@ -579,7 +579,7 @@ class DavListener implements IEventListener
                 try{
                     $client = new Client();
                     $client->setName($to_name);
-                    $client->setEmail($to_email);
+                    $client->setEmail(strtolower($to_email));
                     $client->setProviderId($userId);
                     $client->setDescription("");
                     $client->setPhoneNumber( $this->getPhoneFromDescription($om_info));

@@ -66,5 +66,8 @@
     <background-jobs>
         <job>OCA\Appointments\Cron\Reminders</job>
     </background-jobs>
-
+	<settings>
+		<personal>OCA\Appointments\Settings\Personal</admin>
+		<personal-section>OCA\Appointments\Settings\Section</admin-section>
+	</settings>
 </info>

@@ -54,7 +54,7 @@ class Section implements IIconSection {
          * @return The relative path to a an icon describing the section
          */
         public function getIcon() {
-		return $this->url->imagePath($this->appName, 'app-dark.svg');
+		return $this->urlGenerator->imagePath($this->appName, 'app-dark.svg');
         }
 
 }

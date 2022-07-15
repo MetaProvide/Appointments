@@ -34,12 +34,12 @@ style('appointments', 'settings');    // adds a CSS file
             <label>
                 <?php p($l->t('E-mail')); ?>
             </label>
-            <input type="email" id="email" name="email" value="<?php p($_['email']) ?>" placeholder="<?php p($l->t('Your email address')); ?>" autocomplete="on" autocapitalize="none" autocorrect="off" />           
+            <input type="email" id="email" name="email" value="<?php p($_['email']) ?>" placeholder="<?php p($l->t('Your email address')); ?>" />           
         
             <label>
                 <?php p($l->t('Phone')); ?>
             </label>
-            <input type="tel" id="phone" name="phone" value="<?php p($_['phone']) ?>" placeholder="<?php p($l->t('Your phone number')); ?>" autocomplete="on" autocapitalize="none" autocorrect="off" />
+            <input type="tel" id="phone" name="phone"  data-filter='(\+|(\+[1-9])?[0-9]*)' value="<?php p($_['phone']) ?>" placeholder="<?php p($l->t('Your phone number')); ?>" autocomplete="on" autocapitalize="none" autocorrect="off" />
             
             </div>
         <button id="appointments-save-settings" class="primary"><?php p($l->t("Save")); ?></button>

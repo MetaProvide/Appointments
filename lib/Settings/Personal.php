@@ -59,14 +59,15 @@ class Personal implements ISettings
 	public function getForm()
 	{
 		$formToken = $this->appointmentsUtils->getToken($this->userId);
+		$settings = $this->appointmentsUtils->getUserSettings('org_info',$this->userId);
 		$publicPageUrl = $this->urlGenerator->getBaseUrl() . "/apps/appointments/pub/" . $formToken . "/form";
 
 		//$lastSentReportTime = $this->config->getAppValue($this->appName, 'org-name', 0);
 		$parameters = [
 			'public-page-url' => $publicPageUrl,
-			'phone' => 0,
-			'email'=> 'email',
-			'name'=> 'name'
+			'phone' => $settings['phone'],
+			'email'=> $settings['email'],
+			'name'=> $settings['organization']
 		];
 		return new TemplateResponse($this->appName, 'personal-settings', $parameters, '');
 	}

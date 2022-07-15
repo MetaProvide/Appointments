@@ -3,50 +3,54 @@
 namespace OCA\Appointments\Settings;
 
 use OCP\AppFramework\Http\TemplateResponse;
-use OCP\BackgroundJob\IJobList;
 use OCP\IConfig;
-use OCP\IDateTimeFormatter;
+use OCP\IURLGenerator;
 use OCP\IL10N;
 use OCP\Settings\ISettings;
+use OCP\IUserSession;
+use OCA\Appointments\Backend\BackendUtils;
 
 class Personal implements ISettings
 {
 	/** @var string */
 	protected $appName;
 
+	/** @var string */
+	private $userId;
+
 	/** @var IConfig */
 	private $config;
 
 	/** @var IL10N */
 	private $l;
+	
+	/** @var BackendUtils */
+	private $appointmentsUtils;
 
-	/** @var IDateTimeFormatter */
-	private $dateTimeFormatter;
-
-	/** @var IJobList */
-	private $jobList;
+	/** @var IURLGenerator */
+	private $urlGenerator;
 
 	/**
-	 * Admin constructor.
+	 * Personal constructor.
 	 *
 	 * @param Collector $collector
 	 * @param IConfig $config
 	 * @param IL10N $l
-	 * @param IDateTimeFormatter $dateTimeFormatter
-	 * @param IJobList $jobList
 	 */
 	public function __construct(
-		$appName,
+		string $appName,
 		IConfig $config,
 		IL10N $l,
-		IDateTimeFormatter $dateTimeFormatter,
-		IJobList $jobList
+        IURLGenerator $urlGenerator,
+		BackendUtils $appointmentsUtils,
+		IUserSession $userSession
 	) {
 		$this->appName = $appName;
 		$this->config = $config;
 		$this->l = $l;
-		$this->dateTimeFormatter = $dateTimeFormatter;
-		$this->jobList = $jobList;
+		$this->appointmentsUtils = $appointmentsUtils;
+		$this->userId = $userSession->getUser()->getUID();
+		$this->urlGenerator = $urlGenerator;
 	}
 
 	/**
@@ -54,8 +58,16 @@ class Personal implements ISettings
 	 */
 	public function getForm()
 	{
+		$formToken = $this->appointmentsUtils->getToken($this->userId);
+		$publicPageUrl = $this->urlGenerator->getBaseUrl() . "/apps/appointments/pub/" . $formToken . "/form";
 
-		return new TemplateResponse($this->appName, 'personal-settings', [], '');
+		//$lastSentReportTime = $this->config->getAppValue($this->appName, 'org-name', 0);
+		$parameters = [
+			'public-page-url' => $publicPageUrl,
+			'phone' => 0,
+			'email'=> 'email'
+		];
+		return new TemplateResponse($this->appName, 'personal-settings', $parameters, '');
 	}
 
 	/**

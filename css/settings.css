@@ -1,0 +1,7 @@
+button{
+    background-color: aqua !important;
+}
+.col{
+    display: flex;
+    flex-direction: column;
+}

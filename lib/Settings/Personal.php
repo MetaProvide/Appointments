@@ -65,7 +65,8 @@ class Personal implements ISettings
 		$parameters = [
 			'public-page-url' => $publicPageUrl,
 			'phone' => 0,
-			'email'=> 'email'
+			'email'=> 'email',
+			'name'=> 'name'
 		];
 		return new TemplateResponse($this->appName, 'personal-settings', $parameters, '');
 	}

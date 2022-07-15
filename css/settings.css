@@ -1,7 +1,30 @@
-button{
-    background-color: aqua !important;
-}
-.col{
+.form-col{
     display: flex;
     flex-direction: column;
+    padding-bottom: 2rem;
 }
+
+.row{
+    flex-direction: row;
+}
+
+input{
+    width: max-content;
+}
+
+.pub-page{
+    padding-bottom: 1rem;
+}
+
+.subtitle{    
+    opacity: 0.7;
+}
+
+.title-subtitle{
+    padding-bottom: 1rem;
+}
+
+.title-subtitle h2{
+    margin-bottom: 0 !important;
+}
+

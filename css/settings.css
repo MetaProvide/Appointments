@@ -28,3 +28,7 @@ input{
     margin-bottom: 0 !important;
 }
 
+#saved{
+    display: none;
+}
+

@@ -41,8 +41,11 @@ style('appointments', 'settings');    // adds a CSS file
             </label>
             <input type="tel" id="phone" name="phone"  data-filter='(\+|(\+[1-9])?[0-9]*)' value="<?php p($_['phone']) ?>" placeholder="<?php p($l->t('Your phone number')); ?>" autocomplete="on" autocapitalize="none" autocorrect="off" />  
             
-            <div id="saved"><?php p($l->t('Saved')); ?></div> 
+            
         </div>
-        <button id="appointments-save-settings" class="primary"><?php p($l->t("Save")); ?></button>
+        <div>
+            <button id="appointments-save-settings" class="primary"><?php p($l->t("Save")); ?></button>
+            <div id="saved"><?php p($l->t('Saved')); ?></div>
+        </div>
 
 </div>

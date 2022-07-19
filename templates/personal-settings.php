@@ -12,7 +12,7 @@ style('appointments', 'settings'); // adds a CSS file
     <h2><?php p($l->t('Appointments')); ?></h2>
 
 
-    <div class="pub-page">
+    <div class="urls">
         <h3>
             <?php p($l->t('Public Page URL')); ?>
         </h3>
@@ -21,6 +21,15 @@ style('appointments', 'settings'); // adds a CSS file
         </a>
         <button id="copyPubUrl" class="copy-btn"></button>
         <div id="pubUrlLabel"><?php p($l->t('Copied')); ?></div>
+
+        <h3>
+            <?php p($l->t('Embeddable URL')); ?>
+        </h3>
+        <a id="embedUrl" href="<?php p($_['embed-url']) ?>" target="_blank">
+            <?php p($_['embed-url']) ?>
+        </a>
+        <button id="copyEmbUrl" class="copy-btn"></button>
+        <div id="embedUrlLabel"><?php p($l->t('Copied')); ?></div>
     </div>
     <div class="title-subtitle">
         <h2>

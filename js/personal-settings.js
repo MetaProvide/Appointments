@@ -64,3 +64,15 @@ document.getElementById("copyPubUrl").onclick = function () {
     pubUrlCopiedLabel.style.display = "none";
   });
 };
+
+document.getElementById("copyEmbUrl").onclick = function () {
+  const cb = navigator.clipboard;
+  const embedUrl = document.getElementById("embedUrl");
+  const embedUrlCopiedLabel = document.getElementById("embedUrlLabel");
+
+  cb.writeText(embedUrl.innerText).then(async () => {
+    embedUrlCopiedLabel.style.display = "unset";
+    await delay(3000);
+    embedUrlCopiedLabel.style.display = "none";
+  });
+};

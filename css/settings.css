@@ -12,7 +12,7 @@ input{
     width: max-content;
 }
 
-.pub-page{
+.urls{
     padding-bottom: 1rem;
 }
 
@@ -28,7 +28,7 @@ input{
     margin-bottom: 0 !important;
 }
 
-#saved{
+#saved, #pubUrlLabel, #embedUrlLabel{
     display: none;
 }
 
@@ -40,8 +40,5 @@ input{
 
 #appointments h3{
     font-weight: 600;
-}
-
-#pubUrlLabel{
-    display: none;
+    margin-bottom: unset;
 }

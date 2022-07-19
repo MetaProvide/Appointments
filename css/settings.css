@@ -32,3 +32,16 @@ input{
     display: none;
 }
 
+.copy-btn{
+    background-image: var(--icon-clippy-000);    
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+#appointments h3{
+    font-weight: 600;
+}
+
+#pubUrlLabel{
+    display: none;
+}

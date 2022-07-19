@@ -38,13 +38,6 @@
             <step>OCA\Appointments\Migration\InstallHook</step>
         </install>
     </repair-steps>
-    <navigations>
-        <navigation>
-            <name>Appointments</name>
-            <route>appointments.page.index</route>
-            <icon>adminly_appointments.svg</icon>
-        </navigation>
-    </navigations>
 	<activity>
 		<settings>
 			<setting>OCA\Appointments\Activity\Setting</setting>

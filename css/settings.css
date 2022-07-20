@@ -32,10 +32,16 @@ input{
     display: none;
 }
 
+#embedUrl, #pubUrl {
+    vertical-align: text-bottom;
+}
+
 .copy-btn{
     background-image: var(--icon-clippy-000);    
     background-repeat: no-repeat;
     background-position: center;
+    background-color: unset !important;
+    border: none !important;
 }
 
 #appointments h3{

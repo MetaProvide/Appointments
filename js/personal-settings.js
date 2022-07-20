@@ -38,7 +38,7 @@ document.getElementById("appointments-save-settings").onclick = function () {
   if (!invalid) {
     const payload = {
       a: "set_uci",
-      d: `{\"organization\":\"${name.value}\",\"email\":\"${email.value}\",\"address\":\"\",\"phone\":\"${phone.value}\",\"confirmedRdrUrl\":\"\",\"confirmedRdrId\":false,\"confirmedRdrData\":false}`,
+      d: `{\"organization\":\"${name.value}\",\"email\":\"${email.value}\",\"address\":\" \",\"phone\":\"${phone.value}\",\"confirmedRdrUrl\":\"\",\"confirmedRdrId\":false,\"confirmedRdrData\":false}`,
       p: "p0",
     };
 

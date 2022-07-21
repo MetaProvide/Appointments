@@ -23,7 +23,7 @@ style('appointments', 'settings'); // adds a CSS file
         <div id="pubUrlLabel"><?php p($l->t('Copied')); ?></div>
 
         <h3>
-            <?php p($l->t('Embeddable URL:')); ?>
+            <?php p($l->t('Embeddable URL')); ?>
         </h3>
         <a id="embedUrl" href="<?php p($_['embed-url']) ?>" target="_blank">
             <?php p($_['embed-url']) ?>

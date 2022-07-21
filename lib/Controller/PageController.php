@@ -706,6 +706,8 @@ class PageController extends Controller
         // this will pass validation
         if ($hide_phone) $post['phone'] = "1234567890";
 
+        $post['email'] = strtolower($post['email']);
+
         if (!isset($post['adatetime']) || strlen($post['adatetime']) > 127
             || preg_match('/[^a-zA-Z0-9+\/=]/', $post['adatetime'])
 

@@ -32,8 +32,8 @@ input{
     display: none;
 }
 
-#embedUrl, #pubUrl {
-    vertical-align: text-bottom;
+#embedUrl, #pubUrl, .copy-btn {
+    vertical-align: middle;
 }
 
 .copy-btn{

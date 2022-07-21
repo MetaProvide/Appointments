@@ -38,13 +38,6 @@
             <step>OCA\Appointments\Migration\InstallHook</step>
         </install>
     </repair-steps>
-    <navigations>
-        <navigation>
-            <name>Appointments</name>
-            <route>appointments.page.index</route>
-            <icon>adminly_appointments.svg</icon>
-        </navigation>
-    </navigations>
 	<activity>
 		<settings>
 			<setting>OCA\Appointments\Activity\Setting</setting>
@@ -66,5 +59,8 @@
     <background-jobs>
         <job>OCA\Appointments\Cron\Reminders</job>
     </background-jobs>
-
+	<settings>
+		<personal>OCA\Appointments\Settings\Personal</personal>
+		<personal-section>OCA\Appointments\Settings\Section</personal-section>
+	</settings>
 </info>

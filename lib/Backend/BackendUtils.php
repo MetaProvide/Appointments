@@ -1769,7 +1769,7 @@ class BackendUtils
 
     function getPublicWebBase() {
 //        return $this->urlGenerator->getBaseUrl() . '/index.php/apps/appointments';
-        return $this->urlGenerator->getAbsoluteURL('/index.php/apps/appointments');
+        return $this->urlGenerator->getAbsoluteURL('/apps/appointments');
     }
 
     /**

@@ -3,7 +3,7 @@
 /** @var $l \OCP\IL10N */
 /** @var $_ array */
 
-script('appointments', 'personal-settings'); // adds a JavaScript file
+script('appointments', 'personalSettings'); // adds a JavaScript file
 style('appointments', 'settings'); // adds a CSS file
 
 ?>

@@ -118,13 +118,13 @@ document.getElementById("appointments-save-settings").onclick = function () {
   }
 };
 document.getElementById("copyPubUrl").onclick = function () {
-  const pubUrl = document.getElementById("pubUrl").innerText;
+  const pubUrl = document.getElementById("pubUrl").href;
   const copyOk = copyToClipboard(pubUrl);
   showCopyPubUrl(copyOk);
 };
 
 document.getElementById("copyEmbUrl").onclick = function () {
-  const embedUrl = document.getElementById("embedUrl");
+  const embedUrl = document.getElementById("embedUrl").href;
   const copyOk = copyToClipboard(embedUrl);
   showCopyEmbUrl(copyOk);
 };

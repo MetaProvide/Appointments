@@ -3,7 +3,7 @@
 /** @var $l \OCP\IL10N */
 /** @var $_ array */
 
-script('appointments', 'personal-settings'); // adds a JavaScript file
+script('appointments', 'personalSettings'); // adds a JavaScript file
 style('appointments', 'settings'); // adds a CSS file
 
 ?>
@@ -20,7 +20,7 @@ style('appointments', 'settings'); // adds a CSS file
             <?php p($_['public-page-url']) ?>
         </a>
         <button id="copyPubUrl" class="copy-btn"></button>
-        <div id="pubUrlLabel"><?php p($l->t('Copied')); ?></div>
+        <div id="pubUrlLabel"></div>
 
         <h3>
             <?php p($l->t('Embeddable URL')); ?>
@@ -29,7 +29,7 @@ style('appointments', 'settings'); // adds a CSS file
             <?php p($_['embed-url']) ?>
         </a>
         <button id="copyEmbUrl" class="copy-btn"></button>
-        <div id="embedUrlLabel"><?php p($l->t('Copied')); ?></div>
+        <div id="embedUrlLabel"></div>
     </div>
     <div class="title-subtitle">
         <h2>

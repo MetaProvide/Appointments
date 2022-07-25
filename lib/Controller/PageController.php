@@ -175,18 +175,12 @@ class PageController extends Controller
     }
 
     function setEmbCsp($tr, $userId) {
-
-        $ad = $this->c->getAppValue(
-            $this->appName,
-            'emb_afad_' . $userId);
-        if (strlen($ad) > 3) {
-            $csp = $tr->getContentSecurityPolicy();
-            if ($csp === null) {
-                $csp = new ContentSecurityPolicy();
-                $tr->setContentSecurityPolicy($csp);
-            }
-            $csp->addAllowedFrameAncestorDomain($ad);
+        $csp = $tr->getContentSecurityPolicy();
+        if ($csp === null) {
+            $csp = new ContentSecurityPolicy();
+            $tr->setContentSecurityPolicy($csp);
         }
+        $csp->addAllowedFrameAncestorDomain("'*'");
     }
 
     // ---- END EMBEDDABLE -----

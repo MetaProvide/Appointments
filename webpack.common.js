@@ -8,6 +8,7 @@ module.exports = {
 		script: path.join(__dirname, 'src', 'main.js'),
 		form: path.join(__dirname, 'src', 'form.js'),
 		cncf: path.join(__dirname, 'src', 'cncf.js'),
+		personalSettings: path.join(__dirname, 'src', 'personalSettings.js'),
 	},
 	output: {
 		path: path.resolve(__dirname, './js'),

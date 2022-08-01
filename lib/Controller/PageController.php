@@ -180,7 +180,7 @@ class PageController extends Controller
             $csp = new ContentSecurityPolicy();
             $tr->setContentSecurityPolicy($csp);
         }
-        $csp->addAllowedFrameAncestorDomain("'*'");
+        $csp->addAllowedFrameAncestorDomain("*");
     }
 
     // ---- END EMBEDDABLE -----

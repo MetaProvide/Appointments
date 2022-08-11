@@ -543,16 +543,19 @@ class DavListener implements IEventListener
 
         $ext_event_type = -1;
 
+        $tmpl->addHeader();
+
         if ($hint === BackendUtils::APPT_SES_BOOK) {
             // Just booked, send email to the attendee requesting confirmation...
 
             // TRANSLATORS Subject for email, Ex: {{Organization Name}} Appointment (action needed)
             $tmpl->setSubject($this->l10N->t("%s appointment (action needed)", [$org_name]));
+
             // TRANSLATORS First line of email, Ex: Dear {{Customer Name}},
-            $tmpl->addBodyText($this->l10N->t("Dear %s,", $to_name));
+            $tmpl->addAppointmentText($this->l10N->t("Dear %s,", $to_name));
 
             // TRANSLATORS Main part of email, Ex: The {{Organization Name}} appointment scheduled for {{Date Time}} is awaiting your confirmation.
-            $tmpl->addBodyText($this->l10N->t('The %1$s appointment scheduled for %2$s is awaiting your confirmation.', [$org_name, $date_time]));
+            $tmpl->addAppointmentText($this->l10N->t('The %1$s appointment scheduled for %2$s is awaiting your confirmation.', [$org_name, $date_time]));
 
             list($btn_url, $btn_tkn) = $this->makeBtnInfo(
                 $userId, $pageId, $embed,
@@ -602,9 +605,9 @@ class DavListener implements IEventListener
 
             // TRANSLATORS Subject for email, Ex: {{Organization Name}} Appointment is Confirmed
             $tmpl->setSubject($this->l10N->t("%s Appointment is confirmed", [$org_name]));
-            $tmpl->addBodyText($to_name . ",");
+            $tmpl->addAppointmentText($to_name . ",");
             // TRANSLATORS Main body of email,Ex: Your {{Organization Name}} appointment scheduled for {{Date Time}} is now confirmed.
-            $tmpl->addBodyText($this->l10N->t('Your %1$s appointment scheduled for %2$s is now confirmed.', [$org_name, $date_time]));
+            $tmpl->addAppointmentText($this->l10N->t('Your %1$s appointment scheduled for %2$s is now confirmed.', [$org_name, $date_time]));
 
             // add cancellation link
             list($btn_url, $btn_tkn) = $this->makeBtnInfo(
@@ -629,7 +632,7 @@ class DavListener implements IEventListener
                     if ($tlk[BackendUtils::TALK_FORM_ENABLED] === true) {
                         if ($has_link === 0) {
                             // add in-person meeting type
-                            $tmpl->addBodyText($this->makeMeetingTypeInfo($tlk, $has_link));
+                            $tmpl->addAppointmentText($this->makeMeetingTypeInfo($tlk, $has_link));
                         }
                         $this->addTypeChangeLink($tmpl, $tlk, $btn_url . "3" . $btn_tkn, $has_link);
                     }
@@ -982,7 +985,7 @@ class DavListener implements IEventListener
 
                 $tmpl->setSubject($om_prefix . ": " . $to_name . ", "
                     . $utils->getDateTimeString($evt_dt, $utz_info, 1));
-                $tmpl->addHeading(" "); // spacer
+                $tmpl->addHeader(); // spacer
                 $tmpl->addBodyText($om_prefix);
                 $tmpl->addBodyListItem($utils->getDateTimeString($evt_dt, $utz_info));
                 foreach ($oma as $info) {
@@ -994,6 +997,9 @@ class DavListener implements IEventListener
                 if (count($pages) > 1) {
                     $tmpl->addBodyListItem($pages[$pageId]['label']);
                 }
+
+                // Add footer
+                $tmpl->addFooter('');
 
                 $msg = $mailer->createMessage();
                 $msg->setFrom(array($def_email));
@@ -1147,7 +1153,7 @@ class DavListener implements IEventListener
                     $h = $p1 . '<a href="' . $typeChangeLink . '">' . $ltx . '<a>' . $p2;
                     $t = $p1 . $ltx . ': ' . $typeChangeLink . ' ' . $p2;
 
-                    $tmpl->addBodyText($h, $t);
+                    $tmpl->addAppointmentText($h, $t);
                 }
             }
         }
@@ -1219,11 +1225,11 @@ class DavListener implements IEventListener
 
     function finalizeEmailText(&$tmpl, $cnl_lnk_url) {
 
-        $tmpl->addBodyText($this->l10N->t("Thank you"));
+        $tmpl->addAppointmentText($this->l10N->t("Thank you."));
 
         // cancellation link for confirmation emails
         if (!empty($cnl_lnk_url)) {
-            $tmpl->addBodyText(
+            $tmpl->addAppointmentText(
                 '<div style="font-size: 80%;color: #989898">' .
                 // TRANSLATORS This is a part of an email message. %1$s Cancel Appointment %2$s is a link to the cancellation page (HTML format).
                 $this->l10N->t('To cancel your appointment please click: %1$s Cancel Appointment %2$s', ['<a style="color: #989898" href="' . $cnl_lnk_url . '">', '</a>'])
@@ -1233,7 +1239,8 @@ class DavListener implements IEventListener
             );
         }
 
-        $tmpl->addFooter("Booked via Nextcloud Appointments App");
+        // Add footer
+        $tmpl->addFooter('');
 
     }
     function publishBookingActivity($hint, array $object, $userId) {

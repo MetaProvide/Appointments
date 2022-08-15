@@ -986,7 +986,7 @@ class DavListener implements IEventListener
                 $tmpl->setSubject($om_prefix . ": " . $to_name . ", "
                     . $utils->getDateTimeString($evt_dt, $utz_info, 1));
                 $tmpl->addHeader(); // spacer
-                $tmpl->addBodyText($om_prefix);
+                $tmpl->addAppointmentText($om_prefix);
                 $tmpl->addBodyListItem($utils->getDateTimeString($evt_dt, $utz_info));
                 foreach ($oma as $info) {
                     if (strlen($info) > 2) $tmpl->addBodyListItem($info);
@@ -1075,7 +1075,7 @@ class DavListener implements IEventListener
      */
     private function addTalkInfo($tmpl, $xad, $ti, $tlk, $c) {
         $url = $ti->getRoomURL($xad[4]);
-        $url_html = '<a target="_blank" href="' . $url . '">' . $url . '</a>';
+        $url_html = '<a target="_blank" style="color:#6C9CE3;" href="' . $url . '">' . $url . '</a>';
 
         $eml_txt = $tlk[BackendUtils::TALK_EMAIL_TXT];
         $s = "subs" . 'tr';
@@ -1102,14 +1102,15 @@ class DavListener implements IEventListener
             }
         } else {
             // TRANSLATORS This a link to chat/(video)call, Ex: Chat/Call link: https://my_domain.com/call/kzu6e4uv
-            $talk_link_html = $this->l10N->t("Chat/Call link: %s", [$url_html]);
+            // $talk_link_html = $this->l10N->t("Chat/Call link: %s", [$url_html]);
+            $talk_link_html = $this->l10N->t('Chat/Call link: %1$s %2$s', ['<br><br>', $url_html]);
             if ($xad[5] !== '_') {
                 // we have pass
                 $talk_link_html .= '<br>' . $this->l10N->t('Password') . ": " . $xad[5];
             }
         }
         $talk_link_txt = strip_tags(str_replace("<br>", "\n", $talk_link_html));
-        $tmpl->addBodyText($talk_link_html, $talk_link_txt);
+        $tmpl->addAppointmentText($talk_link_html, $talk_link_txt);
         return trim($talk_link_txt);
     }
 
@@ -1230,9 +1231,9 @@ class DavListener implements IEventListener
         // cancellation link for confirmation emails
         if (!empty($cnl_lnk_url)) {
             $tmpl->addAppointmentText(
-                '<div style="font-size: 80%;color: #989898">' .
+                '<div style="font-size: 80%;color: #8284b2; text-align: center;">' .
                 // TRANSLATORS This is a part of an email message. %1$s Cancel Appointment %2$s is a link to the cancellation page (HTML format).
-                $this->l10N->t('To cancel your appointment please click: %1$s Cancel Appointment %2$s', ['<a style="color: #989898" href="' . $cnl_lnk_url . '">', '</a>'])
+                $this->l10N->t('To cancel your appointment please click: %1$s Cancel Appointment %2$s', ['<a style="color: #8284b2" href="' . $cnl_lnk_url . '">', '</a>'])
                 . "</div>",
                 // TRANSLATORS This is a part of an email message. %s is a URL of the cancellation page (PLAIN TEXT format).
                 $this->l10N->t('To cancel your appointment please visit: %s', $cnl_lnk_url)

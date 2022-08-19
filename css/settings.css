@@ -67,3 +67,12 @@ input{
 .form-col label{
     padding-top: 0.5rem;
 }
+
+label{
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.subtitle{
+    font-weight: 300;
+}

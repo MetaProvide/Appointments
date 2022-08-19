@@ -47,11 +47,17 @@ input{
 
 #appointments h3{
     font-weight: 600;
+    font-size: 18px;
     margin-bottom: unset;
 }
 
 .header{
     display: flex;
+}
+
+.header h2{
+    font-size: 24px;
+    padding-left: 2rem;
 }
 
 .save{

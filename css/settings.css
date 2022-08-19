@@ -16,8 +16,9 @@ input{
     padding-bottom: 1rem;
 }
 
-.subtitle{    
-    opacity: 0.7;
+.urls a{
+    color: #6295E2;
+    text-decoration: underline;
 }
 
 .title-subtitle{
@@ -37,7 +38,7 @@ input{
 }
 
 .copy-btn{
-    background-image: var(--icon-clippy-000);    
+    background-image: url("../img/clipboard.svg");  
     background-repeat: no-repeat;
     background-position: center;
     background-color: unset !important;
@@ -47,4 +48,16 @@ input{
 #appointments h3{
     font-weight: 600;
     margin-bottom: unset;
+}
+
+.header{
+    display: flex;
+}
+
+.save{
+    margin-left: auto;
+}
+
+.form-col label{
+    padding-top: 0.5rem;
 }

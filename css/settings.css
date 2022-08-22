@@ -55,11 +55,6 @@ input{
     display: flex;
 }
 
-.header h2{
-    font-size: 24px;
-    padding-left: 2rem;
-}
-
 .save{
     margin-left: auto;
 }

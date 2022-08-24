@@ -9,15 +9,16 @@
 }
 
 input{
-    width: max-content;
+    width: 200px;
 }
 
 .urls{
     padding-bottom: 1rem;
 }
 
-.subtitle{    
-    opacity: 0.7;
+.urls a{
+    color: #6295E2;
+    text-decoration: underline;
 }
 
 .title-subtitle{
@@ -37,7 +38,7 @@ input{
 }
 
 .copy-btn{
-    background-image: var(--icon-clippy-000);    
+    background-image: url("../img/clipboard.svg");  
     background-repeat: no-repeat;
     background-position: center;
     background-color: unset !important;
@@ -46,5 +47,27 @@ input{
 
 #appointments h3{
     font-weight: 600;
+    font-size: 18px;
     margin-bottom: unset;
+}
+
+.header{
+    display: flex;
+}
+
+.save{
+    margin-left: 20rem
+}
+
+.form-col label{
+    padding-top: 0.5rem;
+}
+
+label{
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.subtitle{
+    font-weight: 300;
 }

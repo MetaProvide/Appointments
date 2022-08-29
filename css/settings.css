@@ -56,7 +56,12 @@ input{
 }
 
 .save{
-    margin-left: 20rem
+    margin-left: auto;
+    margin-right: 20rem;
+}
+
+#saved {
+    padding-right: 1rem;
 }
 
 .form-col label{

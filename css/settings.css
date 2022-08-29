@@ -29,14 +29,8 @@ input{
     margin-bottom: 0 !important;
 }
 
-#pubUrlLabel, #embedUrlLabel{
+#saved, #pubUrlLabel, #embedUrlLabel{
     display: none;
-}
-
-#saved{
-    color: transparent;
-    display: unset;
-    padding-right: 1rem;
 }
 
 #embedUrl, #pubUrl, .copy-btn {

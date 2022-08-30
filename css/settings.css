@@ -1,3 +1,7 @@
+#appointments{
+    max-width: 720px;
+}
+
 .form-col{
     display: flex;
     flex-direction: column;
@@ -56,7 +60,11 @@ input{
 }
 
 .save{
-    margin-left: 20rem
+    margin-left: auto;
+}
+
+#saved {
+    padding-right: 1rem;
 }
 
 .form-col label{

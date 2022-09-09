@@ -1,26 +1,47 @@
 # This file is licensed under the Affero General Public License version 3 or
 # later. See the COPYING file.
 
-app_name=$(notdir $(CURDIR))
+app_name=Appointments
+app_id=appointments
+build_directory=$(CURDIR)/build
+temp_build_directory=$(build_directory)/temp
+build_tools_directory=$(CURDIR)/build/tools
+
+
 project_directory=$(CURDIR)/../$(app_name)
 build_tools_directory=$(CURDIR)/build/tools
 appstore_build_directory=$(CURDIR)/build/artifacts/appstore
 appstore_package_name=$(appstore_build_directory)/$(app_name)
 
-all: dev-setup build-prod test-php
+all: dev-setup build-js-production test
+
+release: npm-init build-js-production build-tarball
 
 # Dev env management
-dev-setup: clean clean-dev npm-init
+dev-setup: clean clean-dev composer npm-init
+
+# Dependencies
+composer:
+	composer install --prefer-dist
+
+composer-update:
+	composer update --prefer-dist
 
 npm-init:
-	npm install
-
-composer-init:
-	composer install --prefer-dist
-	composer update --prefer-dist
+	npm ci
 
 npm-update:
 	npm update
+
+# Building
+build-js:
+	npm run dev
+
+build-js-production:
+	npm run build
+
+watch-js:
+	npm run watch
 
 # Cleaning
 clean:
@@ -29,14 +50,8 @@ clean:
 clean-dev:
 	rm -rf node_modules
 
-# Building
-build-dev:
-	npm run dev
-
-build-prod: clean
-	npm run build
-
-test-php:
+# Tests
+test:
 	phpunit -c phpunit.xml
 	phpunit -c phpunit.integration.xml
 
@@ -50,25 +65,35 @@ timezones:
 
 
 # Builds the source package for the app store, ignores php and js tests
-appstore: build-prod
-	rm -rf $(appstore_build_directory)
-	mkdir -p $(appstore_build_directory)
-	tar czf $(appstore_package_name).tar.gz \
-	--exclude-vcs \
-	$(project_directory)/ajax \
-	$(project_directory)/appinfo \
-	$(project_directory)/css \
-	$(project_directory)/img \
-	$(project_directory)/js \
-	$(project_directory)/l10n \
-	$(project_directory)/lib \
-	$(project_directory)/templates \
-	$(project_directory)/translationfiles \
-	$(project_directory)/COPYING \
-	$(project_directory)/CHANGELOG.md
-
-#	$(project_directory)/translationfiles \
-
-sign-app:
-	openssl dgst -sha512 -sign ~/certs/appointments.key \
-	$(appstore_package_name).tar.gz | openssl base64
+build-tarball:
+	rm -rf $(build_directory)
+	mkdir -p $(temp_build_directory)
+	rsync -a \
+	--exclude=".git" \
+	--exclude=".github" \
+	--exclude=".tx" \
+	--exclude=".vscode" \
+	--exclude="build" \
+	--exclude="node_modules" \
+	--exclude="screenshots" \
+	--exclude="scss" \
+	--exclude="src" \
+	--exclude="tests" \
+	--exclude="vendor" \
+	--exclude=".gitignore" \
+	--exclude=".l10nignore" \
+	--exclude="babel.config.js" \
+	--exclude="composer.json" \
+	--exclude="composer.lock" \
+	--exclude="Makefile" \
+	--exclude="package-lock.json" \
+	--exclude="package.json" \
+	--exclude="phpunit.integration.xml" \
+	--exclude="phpunit.xml" \
+	--exclude="pnpm-lock.yaml" \
+	--exclude="webpack.common.js" \
+	--exclude="webpack.dev.js" \
+	--exclude="webpack.prod.js" \
+	../$(app_name)/ $(temp_build_directory)/$(app_id)
+	tar czf $(build_directory)/$(app_name).tar.gz \
+		-C $(temp_build_directory) $(app_id)

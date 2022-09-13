@@ -2,10 +2,10 @@
 <info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>appointments</id>
-    <name>Appointments</name>
+    <name>Adminly Appointments</name>
     <summary>Book appointments into your calendar via secure online form.</summary>
     <description><![CDATA[Book appointments into your calendar via secure online form. Attendees can confirm or cancel their appointments via an email link.]]></description>
-    <version>101.12.7</version>
+    <version>100.4.0-alpha1</version>
     <licence>agpl</licence>
     <author mail="sergey@srgdev.com" homepage="https://www.srgdev.com">Sergey Mosin</author>
     <namespace>Appointments</namespace>

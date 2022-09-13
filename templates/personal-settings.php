@@ -49,17 +49,17 @@ style('appointments', 'settings'); // adds a CSS file
         <label>
             <?php p($l->t('Full Name')); ?>
         </label>
-        <input type="text" id="name" name="name" value="<?php p($_['name']) ?>" placeholder="<?php p($l->t('Your name')); ?>" autocomplete="on" autocapitalize="none" autocorrect="off" />
+        <input type="text" id="name" name="name" required value="<?php p($_['name']) ?>" placeholder="<?php p($l->t('Your name')); ?>" autocomplete="on" autocapitalize="none" autocorrect="off" />
        
         <label>
             <?php p($l->t('Phone Number')); ?>
         </label>
-        <input type="tel" id="phone" name="phone" data-filter='(\+|(\+[1-9])?[0-9]*)' value="<?php p($_['phone']) ?>" placeholder="<?php p($l->t('Your phone number')); ?>" autocomplete="on" autocapitalize="none" autocorrect="off" />
+        <input type="tel" id="phone" name="phone" required pattern='(\+|(\+[1-9])?[0-9]*)' value="<?php p($_['phone']) ?>" placeholder="<?php p($l->t('Your phone number')); ?>" autocomplete="on" autocapitalize="none" autocorrect="off" />
 
         <label>
             <?php p($l->t('E-mail')); ?>
         </label>
-        <input type="email" id="email" name="email" value="<?php p($_['email']) ?>" placeholder="<?php p($l->t('Your email address')); ?>" />
+        <input type="email" id="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" value="<?php p($_['email']) ?>" placeholder="<?php p($l->t('Your email address')); ?>" />
     </div>
 
 </div>

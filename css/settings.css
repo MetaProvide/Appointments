@@ -79,3 +79,7 @@ label{
 .subtitle{
     font-weight: 300;
 }
+
+input:invalid {
+    border: 1px solid red !important;
+}

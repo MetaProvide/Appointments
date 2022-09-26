@@ -54,7 +54,7 @@ style('appointments', 'form');
         <input name="email" <?php echo $disabled ?>placeholder="<?php p($l->t("Enter email")); ?>" id="srgdev-ncfp_femail" class="srgdev-ncfp-form-input" type="email">
         <?php
         if($_['appt_hide_phone']===false) {
-            echo '<label for="srgdev-ncfp_fphone" class="srgdev-ncfp-form-label">'.htmlspecialchars($l->t("Phone"), ENT_QUOTES, 'UTF-8').'</label><input name="phone" ' .$disabled .' placeholder="' . htmlspecialchars($l->t("Enter phone number"), ENT_QUOTES, 'UTF-8') . '" id="srgdev-ncfp_fphone" class="srgdev-ncfp-form-input" type="tel">';
+            echo '<label for="srgdev-ncfp_fphone" class="srgdev-ncfp-form-label">'.htmlspecialchars($l->t("Phone"), ENT_QUOTES, 'UTF-8').'</label><input name="phone" ' .$disabled .' placeholder="' . htmlspecialchars($l->t("Enter phone number"), ENT_QUOTES, 'UTF-8') . '" id="srgdev-ncfp_fphone" class="srgdev-ncfp-form-input" pattern=\'(\+|(\+[1-9])?[0-9]*)\' type="tel">';
         }
 
         if(empty($disabled)) echo $_['more_html'];

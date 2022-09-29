@@ -1,0 +1,28 @@
+.multiselect-content-wrapper{
+    max-height: 300px;
+    width: 18em;
+    position: absolute;
+    border: 1px solid var(--color-border-dark);
+    background: var(--color-main-background);
+    z-index: 50;    
+    overflow-y: auto;
+    border-radius: 0 0 var(--border-radius) var(--border-radius);
+}
+
+.multiselect-content{
+
+}
+
+.multiselect-option{
+    padding: 0.5rem;
+    white-space: nowrap;
+}
+
+.client-list-item {
+    padding: inherit;
+    cursor: pointer;
+}
+
+.client-list-item span {
+    font-weight: 500;
+}

@@ -1,0 +1,1 @@
+//document.getElementById('srgdev-ncfp_fname').addEventListener("click", myScript);

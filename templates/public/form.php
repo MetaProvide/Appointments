@@ -53,7 +53,7 @@ style('appointments', 'clientpicker');
         <label for="srgdev-ncfp_fname" class="srgdev-ncfp-form-label"><?php p($l->t("Name"))?></label>
         <input name="name" <?php echo $disabled ?>placeholder="<?php p($l->t("Enter name")); ?>" id="srgdev-ncfp_fname" class="srgdev-ncfp-form-input" type="text">
         <?php if($_['render'] !== 'public' && !empty($_['clients'])): ?>
-            <div class="multiselect-content-wrapper" style="display: none;">
+            <div id="adminly-client-picker" class="multiselect-content-wrapper" style="display: none;">
                 <ul class="multiselect-content">
                     <?php foreach ($_['clients'] as $client) : ?>
                         <li>

@@ -14,12 +14,11 @@
 }
 
 .multiselect-option{
-    padding: 0.5rem;
     white-space: nowrap;
 }
 
 .client-list-item {
-    padding: inherit;
+    padding: 0.5rem;
     cursor: pointer;
 }
 

@@ -7,11 +7,10 @@ document.addEventListener("DOMContentLoaded", function () {
         let clients = clientPicker.getElementsByClassName('client-list-item');
 
         clientNameInput.addEventListener("click", ()=>{clientPicker.style.display = 'block'});
-        clientNameInput.addEventListener("change", ()=>{
+        clientNameInput.addEventListener("input", ()=>{
             const searchValue = clientNameInput.value;
-            console.log(searchValue);
             clients.forEach( client => {
-                const name = client.querySelector('.client-name').innerHTML;
+                const name = client.querySelector('.client-name').innerHTML.toLowerCase();
                 if(name.includes(searchValue)){
                     client.style.display = 'block';
                 }

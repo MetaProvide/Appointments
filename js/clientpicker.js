@@ -1,3 +1,25 @@
+const updateClientList = (clientPicker, clientNameInput, clients) => {
+  clientPicker.style.display = "block";
+  const searchValue = clientNameInput.value.toLowerCase();
+  let results = 0;
+  clients.forEach((client) => {
+    const name = client.querySelector(".client-name").innerHTML.toLowerCase();
+    if (name.includes(searchValue)) {
+      client.style.display = "block";
+      results++;
+    } else if (searchValue) {
+      client.style.display = "none";
+    } else {
+      client.style.display = "block";
+    }
+  });
+  if (searchValue && results === 0) {
+    clientPicker.style.display = "none";
+  } else {
+    clientPicker.style.display = "block";
+  }
+};
+
 document.addEventListener("DOMContentLoaded", function () {
   const clientPicker = document.getElementById("adminly-client-picker");
   if (clientPicker) {
@@ -7,31 +29,11 @@ document.addEventListener("DOMContentLoaded", function () {
     let clients = clientPicker.getElementsByClassName("client-list-item");
 
     clientNameInput.addEventListener("click", (event) => {
-      clientPicker.style.display = "block";
+      updateClientList(clientPicker, clientNameInput, clients);
       event.stopPropagation();
     });
     clientNameInput.addEventListener("input", () => {
-      clientPicker.style.display = "block";
-      const searchValue = clientNameInput.value.toLowerCase();
-      let results = 0;
-      clients.forEach((client) => {
-        const name = client
-          .querySelector(".client-name")
-          .innerHTML.toLowerCase();
-        if (name.includes(searchValue)) {
-          client.style.display = "block";
-          results++;
-        } else if (searchValue) {
-          client.style.display = "none";
-        } else {
-          client.style.display = "block";
-        }
-      });
-      if (searchValue && results === 0) {
-        clientPicker.style.display = "none";
-      } else {
-        clientPicker.style.display = "block";
-      }
+      updateClientList(clientPicker, clientNameInput, clients);
     });
 
     clients.forEach((client) =>

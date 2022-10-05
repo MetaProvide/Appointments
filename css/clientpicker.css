@@ -9,12 +9,8 @@
   border-radius: 0 0 var(--border-radius) var(--border-radius);
 }
 
-.multiselect-content {
-}
-
 .multiselect-option {
   white-space: nowrap;
-  cursor: pointer;
 }
 
 .multiselect-option:hover {
@@ -23,9 +19,15 @@
 
 .client-list-item {
   padding: 0.5rem;
-  cursor: pointer;
 }
 
 .client-list-item span {
   font-weight: 500;
+}
+
+.client-list-item, 
+.client-list-item span,
+.client-list-item p,
+.multiselect-option{
+    cursor: pointer;
 }

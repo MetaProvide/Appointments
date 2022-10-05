@@ -11,7 +11,8 @@ document.addEventListener("DOMContentLoaded", function () {
       event.stopPropagation();
     });
     clientNameInput.addEventListener("input", () => {
-      const searchValue = clientNameInput.value;
+      clientPicker.style.display = "block";
+      const searchValue = clientNameInput.value.toLowerCase();
       let results = 0;
       clients.forEach((client) => {
         const name = client

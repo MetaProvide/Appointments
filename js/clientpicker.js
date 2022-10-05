@@ -9,21 +9,27 @@ document.addEventListener("DOMContentLoaded", function () {
         clientNameInput.addEventListener("click", ()=>{clientPicker.style.display = 'block'});
         clientNameInput.addEventListener("input", ()=>{
             const searchValue = clientNameInput.value;
+            let results = 0;
             clients.forEach( client => {
                 const name = client.querySelector('.client-name').innerHTML.toLowerCase();
                 if(name.includes(searchValue)){
                     client.style.display = 'block';
+                    results ++;
                 }
                 else if(searchValue){
                     client.style.display = 'none';
                 }
                 else{
-                    client.style.display = 'block';}
-            })
+                    client.style.display = 'block';
+                }
+            });
+            if (searchValue && results === 0){
+                clientPicker.style.display = 'none';
+            }
+            else{
+                clientPicker.style.display = 'block';
+            }
         });
-
-
-        
 
         clients.forEach(client => client.addEventListener('click', () => {
             clientNameInput.value = client.querySelector('.client-name').innerHTML;
@@ -32,6 +38,8 @@ document.addEventListener("DOMContentLoaded", function () {
             clientPicker.style.display = 'none';
         }));
 
-
+        $(window).click(function () { //Hide the menus if visible 
+        }); 
+        $('#menucontainer').click(function (event) {event.stopPropagation();});
     }
 });

@@ -87,6 +87,10 @@ class TalkIntegration
 
         $roomToken = $room->getToken();
 
+        $ps = \OC::$server->get(\OCA\Talk\Service\ParticipantService::class);
+        $participant = $ps->getSessionsAndParticipantsForRoom($room)[0];        
+        $this->participantService->updateNotificationLevel($participant, 1);
+        
         $n = "getUs" . "erValue";
         $hd = 'he' . "xdec";
         $c = $this->config->$n($userId, $this->appName, 'c' . "nk");

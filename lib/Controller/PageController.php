@@ -151,6 +151,22 @@ class PageController extends Controller
 
         $tr = $this->showFormPost($userId, $pageId, true);
         $this->setEmbCsp($tr, $userId);
+
+        $hasActiveValidSession = false;
+        
+        if($this->userSession->getUser()){
+            $hasActiveValidSession = $this->userSession->getUser()->getUid() == $userId;
+            if($hasActiveValidSession){
+                $numberOfSessions = (int) $this->c->getAppValue($this->appName, 'internalWidgetBookings');                
+                $this->c->setAppValue($this->appName, 'internalWidgetBookings', $numberOfSessions + 1);
+            }
+        }        
+        
+        if(!$hasActiveValidSession){
+            $numberOfSessions = (int) $this->c->getAppValue($this->appName, 'externalWidgetBookings');                
+            $this->c->setAppValue($this->appName, 'externalWidgetBookings', $numberOfSessions + 1);
+        }
+
         return $tr;
     }
 

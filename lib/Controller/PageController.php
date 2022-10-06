@@ -1004,6 +1004,16 @@ class PageController extends Controller
             $ft = $this->l->t('Book Your Appointment');
         }
 
+        $showClientPicker = false;
+        $clientList = [];
+
+        if($this->userSession->getUser()){
+            $showClientPicker = $this->userSession->getUser()->getUid() == $uid;
+            if($showClientPicker){
+                $clientList = $this->clientMapper->findAll($uid);
+            }
+        }
+
         $params = [
             'appt_sel_opts' => '',
             'appt_state' => '0',
@@ -1016,8 +1026,8 @@ class PageController extends Controller
             'appt_inline_style' => $pps[BackendUtils::PSN_PAGE_STYLE],
             'appt_hide_phone' => $pps[BackendUtils::PSN_HIDE_TEL],
             'more_html' => '',
-            'render' => $render,
-            'clients' => $this->clientMapper->findAll($uid)
+            'showClientPicker' => $showClientPicker,
+            'clients' => $clientList
         ];
 
         // google recaptcha

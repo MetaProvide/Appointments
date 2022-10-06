@@ -1004,12 +1004,12 @@ class PageController extends Controller
             $ft = $this->l->t('Book Your Appointment');
         }
 
-        $showClientPicker = false;
+        $hasActiveValidSession = false;
         $clientList = [];
 
         if($this->userSession->getUser()){
-            $showClientPicker = $this->userSession->getUser()->getUid() == $uid;
-            if($showClientPicker){
+            $hasActiveValidSession = $this->userSession->getUser()->getUid() == $uid;
+            if($hasActiveValidSession){
                 $clientList = $this->clientMapper->findAll($uid);
             }
         }
@@ -1026,7 +1026,7 @@ class PageController extends Controller
             'appt_inline_style' => $pps[BackendUtils::PSN_PAGE_STYLE],
             'appt_hide_phone' => $pps[BackendUtils::PSN_HIDE_TEL],
             'more_html' => '',
-            'showClientPicker' => $showClientPicker,
+            'hasActiveValidSession' => $hasActiveValidSession,
             'clients' => $clientList
         ];
 

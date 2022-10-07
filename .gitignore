@@ -2,6 +2,7 @@
 vendor/
 build/
 node_modules/
-js/
+js/*
+!js/form.js
 *.cache
 composer.phar

@@ -1,8 +1,8 @@
 <?php
 script('appointments', 'form');
 style('appointments', 'form');
-script('appointments', 'clientpicker');
-style('appointments', 'clientPicker');
+script('appointments', 'clientPicker');
+style('appointments', 'clientpicker');
 ?>
 
 <div class="srgdev-ncfp-wrap">

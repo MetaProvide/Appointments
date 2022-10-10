@@ -1026,7 +1026,6 @@ class PageController extends Controller
             'appt_inline_style' => $pps[BackendUtils::PSN_PAGE_STYLE],
             'appt_hide_phone' => $pps[BackendUtils::PSN_HIDE_TEL],
             'more_html' => '',
-            'hasActiveValidSession' => $hasActiveValidSession,
             'clients' => $clientList
         ];
 

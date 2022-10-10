@@ -31,3 +31,7 @@
 .multiselect-option{
     cursor: pointer;
 }
+
+.srgdev-ncfp-form-input.has-results{
+  border-radius: var(--adminly-border-radius-input) var(--adminly-border-radius-input) 0 0!important
+}

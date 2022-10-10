@@ -14,9 +14,11 @@ const updateClientList = (clientPicker, clientNameInput, clients) => {
     }
   });
   if (searchValue && results === 0) {
-    clientPicker.style.display = "none";
+    clientPicker.style.display = "none";     
+    clientNameInput.classList.remove('has-results');
   } else {
     clientPicker.style.display = "block";
+    clientNameInput.classList.add('has-results');
   }
 };
 
@@ -51,8 +53,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     window.addEventListener("click", function () {
       //Hide the menus if visible
-      console.log("oioi");
       clientPicker.style.display = "none";
+      clientNameInput.classList.remove('has-results');
     });
   }
 });

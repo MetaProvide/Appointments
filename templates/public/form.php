@@ -2,7 +2,7 @@
 script('appointments', 'form');
 style('appointments', 'form');
 script('appointments', 'clientpicker');
-style('appointments', 'clientpicker');
+style('appointments', 'clientPicker');
 ?>
 
 <div class="srgdev-ncfp-wrap">

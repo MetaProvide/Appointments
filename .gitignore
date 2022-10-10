@@ -2,7 +2,6 @@
 vendor/
 build/
 node_modules/
-js/*
-!js/clientpicker.js
+js/
 *.cache
 composer.phar

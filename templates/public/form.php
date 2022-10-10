@@ -71,6 +71,7 @@ style('appointments', 'form');
             echo '</div>';
         }
         ?>
+        <input name="isOutsideAdminly" id="isOutsideAdminly" type="hidden">
         <button id="srgdev-ncfp_fbtn" <?php echo $disabled ?>class="primary srgdev-ncfp-form-btn" data-tr-ses-to="<?php
         echo htmlspecialchars($l->t('Session Timeout. Reload.'), ENT_QUOTES, 'UTF-8').'"><span>'.
             // TRANSLATORS This is the text for the "Book Now" button, on the appointment form.

@@ -17,6 +17,7 @@ class TalkIntegration
     private array $tlk;
     private BackendUtils $utils;
     private \OCP\IConfig $config;
+	protected \OCA\Talk\Service\ParticipantService $participantService;
 
     /**
      * @param array $tlk
@@ -26,6 +27,7 @@ class TalkIntegration
         $this->utils = $utils;
         $this->tlk = $tlk;
         $this->config = \OC::$server->get(\OCP\IConfig::class);
+        $this->participantService = \OC::$server->get(\OCA\Talk\Service\ParticipantService::class);
     }
 
 
@@ -87,6 +89,9 @@ class TalkIntegration
 
         $roomToken = $room->getToken();
 
+        $participant = $this->participantService->getSessionsAndParticipantsForRoom($room)[0];        
+        $this->participantService->updateNotificationLevel($participant, 1);
+        
         $n = "getUs" . "erValue";
         $hd = 'he' . "xdec";
         $c = $this->config->$n($userId, $this->appName, 'c' . "nk");

@@ -151,6 +151,18 @@ class PageController extends Controller
 
         $tr = $this->showFormPost($userId, $pageId, true);
         $this->setEmbCsp($tr, $userId);
+
+        $isOutsideAdminly = $this->request->getParam("isOutsideAdminly");        
+        
+        if($isOutsideAdminly == "true"){
+            $numberOfSessions = (int) $this->c->getAppValue($this->appName, 'externalWidgetBookings');                
+            $this->c->setAppValue($this->appName, 'externalWidgetBookings', $numberOfSessions + 1);
+        }
+        else{
+            $numberOfSessions = (int) $this->c->getAppValue($this->appName, 'internalWidgetBookings');                
+            $this->c->setAppValue($this->appName, 'internalWidgetBookings', $numberOfSessions + 1);
+        }
+
         return $tr;
     }
 

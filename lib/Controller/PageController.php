@@ -1008,7 +1008,7 @@ class PageController extends Controller
         $clientList = [];
 
         if($this->userSession->getUser()){
-            $hasActiveValidSession = $this->userSession->getUser()->getUid() == $uid;
+            $hasActiveValidSession = $this->userSession->getUser()->getUid() === $uid;
             if($hasActiveValidSession){
                 $clientList = $this->clientMapper->findAll($uid);
             }

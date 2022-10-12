@@ -3,4 +3,7 @@
   .srgdev-ncfp-wrap {
     font-size: 22px
   }
+  .client-list-item {
+    padding-block: 1rem !important;
+  }
 }

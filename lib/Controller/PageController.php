@@ -20,6 +20,7 @@ use OCP\IUserSession;
 use OCP\Mail\IMailer;
 use OCP\Util;
 use Psr\Log\LoggerInterface;
+use OCA\Adminly_Clients\Db\ClientMapper;
 
 class PageController extends Controller
 {
@@ -35,6 +36,8 @@ class PageController extends Controller
     private $utils;
     private $logger;
     private $userSession;
+    /** @var ClientMapper */
+	private $clientMapper;
 
     public function __construct($AppName,
                                 IRequest $request,
@@ -45,7 +48,8 @@ class PageController extends Controller
                                 IUserSession $userSession,
                                 BackendManager $backendManager,
                                 BackendUtils $utils,
-                                LoggerInterface $logger
+                                LoggerInterface $logger,
+                                ClientMapper $clientMapper
     ) {
         parent::__construct($AppName, $request);
         $this->userId = $UserId;
@@ -57,6 +61,7 @@ class PageController extends Controller
         $this->bc = $backendManager->getConnector();
         $this->utils = $utils;
         $this->logger = $logger;
+        $this->clientMapper = $clientMapper;
     }
 
     /**
@@ -1011,6 +1016,16 @@ class PageController extends Controller
             $ft = $this->l->t('Book Your Appointment');
         }
 
+        $hasActiveValidSession = false;
+        $clientList = [];
+
+        if($this->userSession->getUser()){
+            $hasActiveValidSession = $this->userSession->getUser()->getUid() === $uid;
+            if($hasActiveValidSession){
+                $clientList = $this->clientMapper->findAll($uid);
+            }
+        }
+
         $params = [
             'appt_sel_opts' => '',
             'appt_state' => '0',
@@ -1022,7 +1037,8 @@ class PageController extends Controller
             'appt_gdpr_no_chb' => false,
             'appt_inline_style' => $pps[BackendUtils::PSN_PAGE_STYLE],
             'appt_hide_phone' => $pps[BackendUtils::PSN_HIDE_TEL],
-            'more_html' => ''
+            'more_html' => '',
+            'clients' => $clientList
         ];
 
         // google recaptcha

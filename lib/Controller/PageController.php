@@ -1113,6 +1113,7 @@ class PageController extends Controller
         if (empty($out)) {
             $params['appt_state'] = '5';
         }
+
         $slotsArray = explode(',',$out);
         $slotsArrayUnique = [];
         $slotsArrayTimestamps = [];

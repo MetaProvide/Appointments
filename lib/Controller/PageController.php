@@ -1114,7 +1114,20 @@ class PageController extends Controller
             $params['appt_state'] = '5';
         }
 
-        $params['appt_sel_opts'] = $out;
+        $slotsArray = explode(',',$out);
+        $slotsArrayUnique = [];
+        $slotsArrayTimestamps = [];
+        $i = 0;
+
+        foreach($slotsArray as $slot){
+            if (!in_array(substr($slot, 0,22), $slotsArrayTimestamps)) {
+                $slotsArrayTimestamps[$i] = substr($slot, 0,22);
+                $slotsArrayUnique[$i] = $slot;
+            }
+            $i++;
+        }
+
+        $params['appt_sel_opts'] = implode(',',$slotsArrayUnique);
 
         $params['appt_pps'] =
             BackendUtils::PSN_NWEEKS . ":" . $pps[BackendUtils::PSN_NWEEKS] . '.' .

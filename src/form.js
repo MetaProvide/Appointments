@@ -149,9 +149,6 @@
         if (el !== null && el.checked === false) {
             var isOutsideAdminly = window.location.hostname !== window.parent.location.hostname;
             el.value = isOutsideAdminly;
-            el.setAttribute("err", "err")
-            el.setAttribute("required", "1")
-            lee = 1
         }
 
         if (lee !== 0) {

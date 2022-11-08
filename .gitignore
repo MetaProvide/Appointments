@@ -1,5 +1,8 @@
 node_modules/
-
+.env
+build/
+js/
+*.cache
 /vendor/
 /composer.phar
 /.phpunit.result.cache

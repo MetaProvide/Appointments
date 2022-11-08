@@ -110,7 +110,7 @@
         // Phone field is optional
         // match [0-9], '.()-+,/' and ' ' (space) at least 9 digits
         el = document.getElementById("srgdev-ncfp_fphone")
-        if (el !== null && (el.value === '' || el.value.length < 9 || /^[0-9 .()\-+,/]*$/.test(el.value) === false)) {
+        if (el !== null && (el.value === '' || el.value.length < 4 || /^[0-9 .()\-+,/]*$/.test(el.value) === false)) {
             el.setCustomValidity(t('appointments', 'Phone number is required.'));
             el.addEventListener("input", clearFormErr, false)
             lee = 1
@@ -142,6 +142,13 @@
             el.setAttribute("err", "err")
             el.setAttribute("required", "1")
             lee = 1
+        }
+
+        
+        el = document.getElementById('isOutsideAdminly')
+        if (el !== null && el.checked === false) {
+            var isOutsideAdminly = window.location.hostname !== window.parent.location.hostname;
+            el.value = isOutsideAdminly;
         }
 
         if (lee !== 0) {

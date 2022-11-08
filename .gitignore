@@ -1,3 +1,6 @@
+.env
+vendor/
+build/
 node_modules/
 .env
 build/

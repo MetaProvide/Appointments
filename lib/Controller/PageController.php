@@ -20,6 +20,7 @@ use OCP\IUserSession;
 use OCP\Mail\IMailer;
 use OCP\Util;
 use Psr\Log\LoggerInterface;
+use OCA\Adminly_Clients\Db\ClientMapper;
 
 class PageController extends Controller
 {
@@ -35,6 +36,8 @@ class PageController extends Controller
     private $utils;
     private $logger;
     private $userSession;
+    /** @var ClientMapper */
+	private $clientMapper;
 
     public function __construct($AppName,
                                 IRequest $request,
@@ -45,7 +48,8 @@ class PageController extends Controller
                                 IUserSession $userSession,
                                 BackendManager $backendManager,
                                 BackendUtils $utils,
-                                LoggerInterface $logger
+                                LoggerInterface $logger,
+                                ClientMapper $clientMapper
     ) {
         parent::__construct($AppName, $request);
         $this->userId = $UserId;
@@ -57,6 +61,7 @@ class PageController extends Controller
         $this->bc = $backendManager->getConnector();
         $this->utils = $utils;
         $this->logger = $logger;
+        $this->clientMapper = $clientMapper;
     }
 
     /**
@@ -151,6 +156,18 @@ class PageController extends Controller
 
         $tr = $this->showFormPost($userId, $pageId, true);
         $this->setEmbCsp($tr, $userId);
+
+        $isOutsideAdminly = $this->request->getParam("isOutsideAdminly");        
+        
+        if($isOutsideAdminly == "true"){
+            $numberOfSessions = (int) $this->c->getAppValue($this->appName, 'externalWidgetBookings');                
+            $this->c->setAppValue($this->appName, 'externalWidgetBookings', $numberOfSessions + 1);
+        }
+        else{
+            $numberOfSessions = (int) $this->c->getAppValue($this->appName, 'internalWidgetBookings');                
+            $this->c->setAppValue($this->appName, 'internalWidgetBookings', $numberOfSessions + 1);
+        }
+
         return $tr;
     }
 
@@ -175,18 +192,12 @@ class PageController extends Controller
     }
 
     function setEmbCsp($tr, $userId) {
-
-        $ad = $this->c->getAppValue(
-            $this->appName,
-            'emb_afad_' . $userId);
-        if (strlen($ad) > 3) {
-            $csp = $tr->getContentSecurityPolicy();
-            if ($csp === null) {
-                $csp = new ContentSecurityPolicy();
-                $tr->setContentSecurityPolicy($csp);
-            }
-            $csp->addAllowedFrameAncestorDomain($ad);
+        $csp = $tr->getContentSecurityPolicy();
+        if ($csp === null) {
+            $csp = new ContentSecurityPolicy();
+            $tr->setContentSecurityPolicy($csp);
         }
+        $csp->addAllowedFrameAncestorDomain("*");
     }
 
     // ---- END EMBEDDABLE -----
@@ -706,6 +717,8 @@ class PageController extends Controller
         // this will pass validation
         if ($hide_phone) $post['phone'] = "1234567890";
 
+        $post['email'] = strtolower($post['email']);
+
         if (!isset($post['adatetime']) || strlen($post['adatetime']) > 127
             || preg_match('/[^a-zA-Z0-9+\/=]/', $post['adatetime'])
 
@@ -1003,6 +1016,16 @@ class PageController extends Controller
             $ft = $this->l->t('Book Your Appointment');
         }
 
+        $hasActiveValidSession = false;
+        $clientList = [];
+
+        if($this->userSession->getUser()){
+            $hasActiveValidSession = $this->userSession->getUser()->getUid() === $uid;
+            if($hasActiveValidSession){
+                $clientList = $this->clientMapper->findAll($uid);
+            }
+        }
+
         $params = [
             'appt_sel_opts' => '',
             'appt_state' => '0',
@@ -1014,7 +1037,8 @@ class PageController extends Controller
             'appt_gdpr_no_chb' => false,
             'appt_inline_style' => $pps[BackendUtils::PSN_PAGE_STYLE],
             'appt_hide_phone' => $pps[BackendUtils::PSN_HIDE_TEL],
-            'more_html' => ''
+            'more_html' => '',
+            'clients' => $clientList
         ];
 
         // google recaptcha
@@ -1090,7 +1114,20 @@ class PageController extends Controller
             $params['appt_state'] = '5';
         }
 
-        $params['appt_sel_opts'] = $out;
+        $slotsArray = explode(',',$out);
+        $slotsArrayUnique = [];
+        $slotsArrayTimestamps = [];
+        $i = 0;
+
+        foreach($slotsArray as $slot){
+            if (!in_array(substr($slot, 0,22), $slotsArrayTimestamps)) {
+                $slotsArrayTimestamps[$i] = substr($slot, 0,22);
+                $slotsArrayUnique[$i] = $slot;
+            }
+            $i++;
+        }
+
+        $params['appt_sel_opts'] = implode(',',$slotsArrayUnique);
 
         $params['appt_pps'] =
             BackendUtils::PSN_NWEEKS . ":" . $pps[BackendUtils::PSN_NWEEKS] . '.' .

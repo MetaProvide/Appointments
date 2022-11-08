@@ -1,6 +1,8 @@
 <?php
 script('appointments', 'form');
 style('appointments', 'form');
+script('appointments', 'clientPicker');
+style('appointments', 'clientpicker');
 ?>
 
 <div class="srgdev-ncfp-wrap">
@@ -47,14 +49,33 @@ style('appointments', 'form');
                 <option value="0" class="srgdev-ncfp-form-option" selected>txt</option>
             </select>
         </div>
-        <?php if(isset($_['appt_tlk_type']) && empty($disabled)) echo $_['appt_tlk_type']; ?>
+        <?php if(isset($_['appt_tlk_type']) && empty($disabled)) echo $_['appt_tlk_type']; ?>    
         <label for="srgdev-ncfp_fname" class="srgdev-ncfp-form-label"><?php p($l->t("Name"))?></label>
         <input name="name" <?php echo $disabled ?>placeholder="<?php p($l->t("Enter name")); ?>" id="srgdev-ncfp_fname" class="srgdev-ncfp-form-input" type="text">
+        <?php if(!empty($_['clients'])): ?>
+            <div id="adminly-client-picker" class="multiselect-content-wrapper" style="display: none;">
+                <ul class="multiselect-content">
+                    <?php foreach ($_['clients'] as $client) : ?>
+                        <li>
+                            <div class="multiselect-option">
+                                <div class="client-list-item">
+                                    <span class="client-name"><?php echo $client->getName() ?></span>
+                                    <p class="client-email"><?php echo $client->getEmail() ?></p>
+                                    <?php if($client->getPhoneNumber()): ?>
+                                        <p class="client-phone"><?php echo $client->getPhoneNumber() ?></p>
+                                    <?php endif ?>  
+                                </div>
+                            </span>
+                        </li>
+                    <?php endforeach ?>                    
+                </ul>
+            </div>
+        <?php endif ?>
         <label for="srgdev-ncfp_femail" class="srgdev-ncfp-form-label"><?php p($l->t("Email"));?></label>
         <input name="email" <?php echo $disabled ?>placeholder="<?php p($l->t("Enter email")); ?>" id="srgdev-ncfp_femail" class="srgdev-ncfp-form-input" type="email">
         <?php
         if($_['appt_hide_phone']===false) {
-            echo '<label for="srgdev-ncfp_fphone" class="srgdev-ncfp-form-label">'.htmlspecialchars($l->t("Phone"), ENT_QUOTES, 'UTF-8').'</label><input name="phone" ' .$disabled .' placeholder="' . htmlspecialchars($l->t("Enter phone number"), ENT_QUOTES, 'UTF-8') . '" id="srgdev-ncfp_fphone" class="srgdev-ncfp-form-input" type="tel">';
+            echo '<label for="srgdev-ncfp_fphone" class="srgdev-ncfp-form-label">'.htmlspecialchars($l->t("Phone"), ENT_QUOTES, 'UTF-8').'</label><input name="phone" ' .$disabled .' placeholder="' . htmlspecialchars($l->t("Enter phone number"), ENT_QUOTES, 'UTF-8') . '" id="srgdev-ncfp_fphone" class="srgdev-ncfp-form-input" pattern=\'(\+|(\+[1-9])?[0-9]*)\' type="tel">';
         }
 
         if(empty($disabled)) echo $_['more_html'];
@@ -71,6 +92,7 @@ style('appointments', 'form');
             echo '</div>';
         }
         ?>
+        <input name="isOutsideAdminly" id="isOutsideAdminly" type="hidden">
         <button id="srgdev-ncfp_fbtn" <?php echo $disabled ?>class="primary srgdev-ncfp-form-btn" data-tr-ses-to="<?php
         echo htmlspecialchars($l->t('Session Timeout. Reload.'), ENT_QUOTES, 'UTF-8').'"><span>'.
             // TRANSLATORS This is the text for the "Book Now" button, on the appointment form.

@@ -22,6 +22,10 @@ use OCP\Mail\IEMailTemplate;
 use OCP\Mail\IMailer;
 use Psr\Log\LoggerInterface;
 use Sabre\VObject\Reader;
+use OCP\Activity\IManager as IActivityManager;
+use DateTime;
+use OCA\Adminly_Clients\Db\ClientMapper;
+use OCA\Adminly_Clients\Db\Client;
 
 class DavListener implements IEventListener
 {
@@ -30,6 +34,12 @@ class DavListener implements IEventListener
     private $l10N;
     private $logger;
     private $utils;
+    /** @var IActivityManager */
+    protected $activityManager;
+    /** @var IURLGenerator */
+    protected $url;
+    /** @var ClientMapper */
+	private $mapper;
 
     /** @type IMailer */
     private $mailer;
@@ -39,12 +49,17 @@ class DavListener implements IEventListener
 
     public function __construct(\OCP\IL10N      $l10N,
                                 LoggerInterface $logger,
-                                BackendUtils    $utils) {
+                                BackendUtils    $utils,
+								IActivityManager $activityManager,
+								IURLGenerator $url,
+                                ClientMapper $mapper) {
         $this->appName = Application::APP_ID;
         $this->l10N = $l10N;
         $this->logger = $logger;
         $this->utils = $utils;
-
+        $this->activityManager = $activityManager;
+        $this->url = $url;
+		$this->mapper = $mapper;
         $this->mailer = \OC::$server->get(IMailer::class);
         $this->config = \OC::$server->get(IConfig::class);
     }
@@ -528,16 +543,19 @@ class DavListener implements IEventListener
 
         $ext_event_type = -1;
 
+        $tmpl->addHeader();
+
         if ($hint === BackendUtils::APPT_SES_BOOK) {
             // Just booked, send email to the attendee requesting confirmation...
 
             // TRANSLATORS Subject for email, Ex: {{Organization Name}} Appointment (action needed)
             $tmpl->setSubject($this->l10N->t("%s appointment (action needed)", [$org_name]));
+
             // TRANSLATORS First line of email, Ex: Dear {{Customer Name}},
-            $tmpl->addBodyText($this->l10N->t("Dear %s,", $to_name));
+            $tmpl->addAppointmentText($this->l10N->t("Dear %s,", $to_name));
 
             // TRANSLATORS Main part of email, Ex: The {{Organization Name}} appointment scheduled for {{Date Time}} is awaiting your confirmation.
-            $tmpl->addBodyText($this->l10N->t('The %1$s appointment scheduled for %2$s is awaiting your confirmation.', [$org_name, $date_time]));
+            $tmpl->addAppointmentText($this->l10N->t('The %1$s appointment scheduled for %2$s is awaiting your confirmation.', [$org_name, $date_time]));
 
             list($btn_url, $btn_tkn) = $this->makeBtnInfo(
                 $userId, $pageId, $embed,
@@ -559,15 +577,37 @@ class DavListener implements IEventListener
                 $om_prefix = $this->l10N->t("Appointment pending");
             }
 
+            // create client 
+            if(!$this->mapper->findByEmail($to_email, $userId)){
+                try{
+                    $client = new Client();
+                    $client->setName($to_name);
+                    $client->setEmail(strtolower($to_email));
+                    $client->setProviderId($userId);
+                    $client->setDescription("");
+                    $client->setPhoneNumber( $this->getPhoneFromDescription($om_info));
+                    $client->setTimezone($this->getTimezoneFromDescription($om_info));
+
+                    $newClient = $this->mapper->insert($client);
+                    
+                    //publish the new client actitivty
+                    $this->publishClientActivity($newClient, $userId);
+                }
+                catch(Exception $e){
+                    $this->logger->error($e->getMessage());
+                }
+            }
+            // ----------------------
+
         } elseif ($hint === BackendUtils::APPT_SES_CONFIRM) {
             // Confirm link in the email is clicked ...
             // ... or the email validation step is skipped
 
             // TRANSLATORS Subject for email, Ex: {{Organization Name}} Appointment is Confirmed
             $tmpl->setSubject($this->l10N->t("%s Appointment is confirmed", [$org_name]));
-            $tmpl->addBodyText($to_name . ",");
+            $tmpl->addAppointmentText($to_name . ",");
             // TRANSLATORS Main body of email,Ex: Your {{Organization Name}} appointment scheduled for {{Date Time}} is now confirmed.
-            $tmpl->addBodyText($this->l10N->t('Your %1$s appointment scheduled for %2$s is now confirmed.', [$org_name, $date_time]));
+            $tmpl->addAppointmentText($this->l10N->t('Your %1$s appointment scheduled for %2$s is now confirmed.', [$org_name, $date_time]));
 
             // add cancellation link
             list($btn_url, $btn_tkn) = $this->makeBtnInfo(
@@ -592,7 +632,7 @@ class DavListener implements IEventListener
                     if ($tlk[BackendUtils::TALK_FORM_ENABLED] === true) {
                         if ($has_link === 0) {
                             // add in-person meeting type
-                            $tmpl->addBodyText($this->makeMeetingTypeInfo($tlk, $has_link));
+                            $tmpl->addAppointmentText($this->makeMeetingTypeInfo($tlk, $has_link));
                         }
                         $this->addTypeChangeLink($tmpl, $tlk, $btn_url . "3" . $btn_tkn, $has_link);
                     }
@@ -606,7 +646,6 @@ class DavListener implements IEventListener
             if ($eml_settings[BackendUtils::EML_MCONF]) {
                 $om_prefix = $this->l10N->t("Appointment confirmed");
             }
-
             $ext_event_type = 0;
 
         } elseif ($hint === BackendUtils::APPT_SES_CANCEL || $isDelete) {
@@ -784,6 +823,24 @@ class DavListener implements IEventListener
         } else return;
 
         $this->finalizeEmailText($tmpl, $cnl_lnk_url);
+		
+		
+        // Activity app integration
+
+        $object = $this->getObjectNameAndType($objectData);
+        // creates activity event link
+        $objectId = base64_encode('/remote.php/dav/calendars/' . $userId . '/' . $calendarData['uri'] . '/' . $objectData['uri']);
+        $link = [
+            'view' => 'dayGridMonth',
+            'timeRange' => 'now',
+            'mode' => 'popover',
+            'objectId' => $objectId,
+            'recurrenceId' => 'next'
+        ];
+
+        $object['link'] = $this->url->linkToRouteAbsolute('calendar.view.indexview.timerange.edit', $link);
+
+        $this->publishBookingActivity($hint, $object, $userId);
 
         ///-------------------
 
@@ -928,8 +985,8 @@ class DavListener implements IEventListener
 
                 $tmpl->setSubject($om_prefix . ": " . $to_name . ", "
                     . $utils->getDateTimeString($evt_dt, $utz_info, 1));
-                $tmpl->addHeading(" "); // spacer
-                $tmpl->addBodyText($om_prefix);
+                $tmpl->addHeader(); // spacer
+                $tmpl->addAppointmentText($om_prefix);
                 $tmpl->addBodyListItem($utils->getDateTimeString($evt_dt, $utz_info));
                 foreach ($oma as $info) {
                     if (strlen($info) > 2) $tmpl->addBodyListItem($info);
@@ -940,6 +997,9 @@ class DavListener implements IEventListener
                 if (count($pages) > 1) {
                     $tmpl->addBodyListItem($pages[$pageId]['label']);
                 }
+
+                // Add footer
+                $tmpl->addFooter('');
 
                 $msg = $mailer->createMessage();
                 $msg->setFrom(array($def_email));
@@ -1015,7 +1075,7 @@ class DavListener implements IEventListener
      */
     private function addTalkInfo($tmpl, $xad, $ti, $tlk, $c) {
         $url = $ti->getRoomURL($xad[4]);
-        $url_html = '<a target="_blank" href="' . $url . '">' . $url . '</a>';
+        $url_html = '<a target="_blank" style="color:#6C9CE3;" href="' . $url . '">' . $url . '</a>';
 
         $eml_txt = $tlk[BackendUtils::TALK_EMAIL_TXT];
         $s = "subs" . 'tr';
@@ -1042,14 +1102,15 @@ class DavListener implements IEventListener
             }
         } else {
             // TRANSLATORS This a link to chat/(video)call, Ex: Chat/Call link: https://my_domain.com/call/kzu6e4uv
-            $talk_link_html = $this->l10N->t("Chat/Call link: %s", [$url_html]);
+            // $talk_link_html = $this->l10N->t("Chat/Call link: %s", [$url_html]);
+            $talk_link_html = $this->l10N->t('Chat/Call link: %1$s %2$s', ['<br><br>', $url_html]);
             if ($xad[5] !== '_') {
                 // we have pass
                 $talk_link_html .= '<br>' . $this->l10N->t('Password') . ": " . $xad[5];
             }
         }
         $talk_link_txt = strip_tags(str_replace("<br>", "\n", $talk_link_html));
-        $tmpl->addBodyText($talk_link_html, $talk_link_txt);
+        $tmpl->addAppointmentText($talk_link_html, $talk_link_txt);
         return trim($talk_link_txt);
     }
 
@@ -1093,7 +1154,7 @@ class DavListener implements IEventListener
                     $h = $p1 . '<a href="' . $typeChangeLink . '">' . $ltx . '<a>' . $p2;
                     $t = $p1 . $ltx . ': ' . $typeChangeLink . ' ' . $p2;
 
-                    $tmpl->addBodyText($h, $t);
+                    $tmpl->addAppointmentText($h, $t);
                 }
             }
         }
@@ -1165,22 +1226,98 @@ class DavListener implements IEventListener
 
     function finalizeEmailText(&$tmpl, $cnl_lnk_url) {
 
-        $tmpl->addBodyText($this->l10N->t("Thank you"));
+        $tmpl->addAppointmentText($this->l10N->t("Thank you."));
 
         // cancellation link for confirmation emails
         if (!empty($cnl_lnk_url)) {
-            $tmpl->addBodyText(
-                '<div style="font-size: 80%;color: #989898">' .
+            $tmpl->addAppointmentText(
+                '<div style="font-size: 80%;color: #8284b2; text-align: center;">' .
                 // TRANSLATORS This is a part of an email message. %1$s Cancel Appointment %2$s is a link to the cancellation page (HTML format).
-                $this->l10N->t('To cancel your appointment please click: %1$s Cancel Appointment %2$s', ['<a style="color: #989898" href="' . $cnl_lnk_url . '">', '</a>'])
+                $this->l10N->t('To cancel your appointment please click: %1$s Cancel Appointment %2$s', ['<a style="color: #8284b2" href="' . $cnl_lnk_url . '">', '</a>'])
                 . "</div>",
                 // TRANSLATORS This is a part of an email message. %s is a URL of the cancellation page (PLAIN TEXT format).
                 $this->l10N->t('To cancel your appointment please visit: %s', $cnl_lnk_url)
             );
         }
 
-        $tmpl->addFooter("Booked via Nextcloud Appointments App");
+        // Add footer
+        $tmpl->addFooter('');
 
+    }
+    function publishBookingActivity($hint, array $object, $userId) {
+		
+        switch ($hint) {
+            case BackendUtils::APPT_SES_BOOK:
+                $bookingStatus = "booking_add";
+                break;
+            case BackendUtils::APPT_SES_CONFIRM:
+                $bookingStatus = "booking_confirm";
+                break;
+            case BackendUtils::APPT_SES_CANCEL:
+                $bookingStatus = "booking_cancel";
+                break;
+            case BackendUtils::APPT_SES_SKIP:
+                $bookingStatus = "booking_skip";
+                break;
+            case BackendUtils::APPT_SES_TYPE_CHANGE:
+                $bookingStatus = "booking_type_change";
+                break;
+            default:
+                $bookingStatus = "booking_other";
+                break;
+        }
+
+        $event = $this->activityManager->generateEvent();
+		$dtStart = new DateTime($object['dtStart']);
+		
+        $event->setApp('appointments')
+            ->setObject('booking', (int) $object['id'])
+            ->setType('appointment')
+            ->setAffectedUser($userId)
+            ->setSubject(
+                $bookingStatus,
+                [				
+					'dtStart' => [
+                        'type' => 'calendar',
+                        'id' => $object['dtStart'],
+                        'name' =>  $dtStart->format('Y-m-d H:i'),
+                    ],				
+                    'booking' => [
+                        'type' => 'calendar-event',
+                        'id' => $object['id'],
+                        'name' => $object['name'],
+                        'link' => $object['link'],
+                    ],
+                ]
+            );
+
+        $this->activityManager->publish($event);
+    }
+
+    /**
+     * @param array $objectData
+     * @return string[]|bool
+     */
+    protected function getObjectNameAndType(array $objectData) {
+		
+        $vObject = Reader::read($objectData['calendardata']);
+        $component = $componentType = null;
+        foreach ($vObject->getComponents() as $component) {
+            if (in_array($component->name, ['VEVENT', 'VTODO'])) {
+                $componentType = $component->name;
+                break;
+            }
+        }
+
+        if (!$componentType) {
+            // Calendar objects must have a VEVENT or VTODO component
+            return false;
+        }
+
+        if ($componentType === 'VEVENT') {
+            return ['id' => (string) $component->UID, 'name' => (string) $component->SUMMARY, 'dtStart' => (string) $component->DTSTART, 'type' => 'event'];
+        }
+        return ['id' => (string) $component->UID, 'name' => (string) $component->SUMMARY, 'dtStart' => (string) $component->DTSTART, 'type' => 'todo', 'status' => (string) $component->STATUS];
     }
 
     /**
@@ -1217,6 +1354,38 @@ class DavListener implements IEventListener
             $ret = $da[1];
         }
         return $ret;
+    }
+
+    private function getTimezoneFromDescription(string $description): string {
+        $timezone = "";
+
+        preg_match_all("/[\._a-zA-Z0-9-]+@[\._a-zA-Z0-9-]+/i", $description, $matches);
+        $email = $matches[0][0];
+
+        $arr = explode($email, $description);
+        $timezone = str_replace("\n","",$arr[1]);
+
+        return $timezone;
+    }
+
+    function publishClientActivity($client, $userId) {
+		$event = $this->activityManager->generateEvent();
+			$event->setApp('adminly_clients')
+				->setObject('client', $client->getId())
+				->setType('clients')
+				->setAffectedUser($userId)
+				->setSubject(
+					"client_add",
+					[
+						'client' => [
+							'type' => 'addressbook-contact',
+							'id' => $client->getId(),
+							'name' => $client->getName()
+						],
+					]
+				);
+
+			$this->activityManager->publish($event);
     }
 
     private function addMoreEmailText(IEMailTemplate $template, string $text) {

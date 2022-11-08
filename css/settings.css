@@ -1,0 +1,81 @@
+#appointments{
+    max-width: 720px;
+}
+
+.form-col{
+    display: flex;
+    flex-direction: column;
+    padding-bottom: 2rem;
+}
+
+.row{
+    flex-direction: row;
+}
+
+input{
+    width: 200px;
+}
+
+.urls{
+    padding-bottom: 1rem;
+}
+
+.urls a{
+    color: #6295E2;
+    text-decoration: underline;
+}
+
+.title-subtitle{
+    padding-bottom: 1rem;
+}
+
+.title-subtitle h2{
+    margin-bottom: 0 !important;
+}
+
+#saved, #pubUrlLabel, #embedUrlLabel{
+    display: none;
+}
+
+#embedUrl, #pubUrl, .copy-btn {
+    vertical-align: middle;
+}
+
+.copy-btn{
+    background-image: url("../img/clipboard.svg");  
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: unset !important;
+    border: none !important;
+}
+
+#appointments h3{
+    font-weight: 600;
+    font-size: 18px;
+    margin-bottom: unset;
+}
+
+.header{
+    display: flex;
+}
+
+.save{
+    margin-left: auto;
+}
+
+#saved {
+    padding-right: 1rem;
+}
+
+.form-col label{
+    padding-top: 0.5rem;
+}
+
+label{
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.subtitle{
+    font-weight: 300;
+}

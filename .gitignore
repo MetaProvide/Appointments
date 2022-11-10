@@ -2,6 +2,10 @@
 vendor/
 build/
 node_modules/
+.env
+build/
 js/
 *.cache
-composer.phar
+/vendor/
+/composer.phar
+/.phpunit.result.cache

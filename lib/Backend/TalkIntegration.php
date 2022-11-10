@@ -1,4 +1,6 @@
-<?php /** @noinspection PhpFullyQualifiedNameUsageInspection */
+<?php
+
+/** @noinspection PhpFullyQualifiedNameUsageInspection */
 
 
 namespace OCA\Appointments\Backend;
@@ -17,13 +19,14 @@ class TalkIntegration
     private array $tlk;
     private BackendUtils $utils;
     private \OCP\IConfig $config;
-	protected \OCA\Talk\Service\ParticipantService $participantService;
+    protected \OCA\Talk\Service\ParticipantService $participantService;
 
     /**
      * @param array $tlk
      * @param BackendUtils $utils
      */
-    public function __construct($tlk, $utils) {
+    public function __construct($tlk, $utils)
+    {
         $this->utils = $utils;
         $this->tlk = $tlk;
         $this->config = \OC::$server->get(\OCP\IConfig::class);
@@ -32,7 +35,8 @@ class TalkIntegration
 
 
     /** @return \OCA\Talk\Manager|null */
-    private function getTalkManager() {
+    private function getTalkManager()
+    {
         try {
             /** @type \OCA\Talk\Manager $tm */
             $tm = \OC::$server->get(\OCA\Talk\Manager::class);
@@ -50,7 +54,8 @@ class TalkIntegration
      * @param string $userId
      * @return string room token[chr(31)password], "" = error, "-" = error (should inform user via description)
      */
-    function createRoomForEvent(string $attendeeName, $dateTime, string $userId): string {
+    function createRoomForEvent(string $attendeeName, $dateTime, string $userId): string
+    {
         if ($dateTime->isFloating() === true) {
             $this->logError("Talk room error: TalkIntegration - floating timezones are not supported");
             return "-";
@@ -89,9 +94,9 @@ class TalkIntegration
 
         $roomToken = $room->getToken();
 
-        $participant = $this->participantService->getSessionsAndParticipantsForRoom($room)[0];        
+        $participant = $this->participantService->getSessionsAndParticipantsForRoom($room)[0];
         $this->participantService->updateNotificationLevel($participant, 1);
-        
+
         $n = "getUs" . "erValue";
         $hd = 'he' . "xdec";
         $c = $this->config->$n($userId, $this->appName, 'c' . "nk");
@@ -118,7 +123,8 @@ class TalkIntegration
      * @param Room $room
      * @param int|null $timer
      */
-    function setLobby(Room $room, ?int $timer = null) {
+    function setLobby(Room $room, ?int $timer = null)
+    {
         // $room->setLobby wants utc timezone ?!?
         // @see OCA\Talk\Controller\WebinarController->setLobby
         // $_dt=new \DateTime(null,new \DateTimeZone('UTC'));
@@ -132,7 +138,8 @@ class TalkIntegration
      * @param Room $room
      * @return string
      */
-    function setPassword(Room $room): string {
+    function setPassword(Room $room): string
+    {
         $p = substr(str_replace(['+', '/', '='], '', base64_encode(md5(rand(), true))), 0, 9);
 
         if ($room->setPassword($p) === true) {
@@ -152,15 +159,17 @@ class TalkIntegration
      * @param string $pref optional prefix
      * @return bool
      */
-    function renameRoom(string $token, string $guestName, $dateTime, string $userId, string $pref = ""): bool {
+    function renameRoom(string $token, string $guestName, $dateTime, string $userId, string $pref = ""): bool
+    {
         $tm = $this->getTalkManager();
         $r = false;
         if ($tm !== null) {
             if (!empty($pref)) $pref = trim($pref) . ' ';
             try {
                 $room = $tm->getRoomByToken($token);
-                $r = $room->setName($pref .
-                    $this->formatRoomName($guestName, $dateTime, $userId)
+                $r = $room->setName(
+                    $pref .
+                        $this->formatRoomName($guestName, $dateTime, $userId)
                 );
             } catch (\Exception $e) {
                 $this->logError("Room not found, token: " . $token);
@@ -176,7 +185,8 @@ class TalkIntegration
      * @param string $userId
      * @return string
      */
-    private function formatRoomName(string $guestName, \Sabre\VObject\Property\ICalendar\DateTime $dateTime, string $userId): string {
+    private function formatRoomName(string $guestName, \Sabre\VObject\Property\ICalendar\DateTime $dateTime, string $userId): string
+    {
         $f = $this->tlk[BackendUtils::TALK_NAME_FORMAT];
         if ($this->config->getUserValue($userId, $this->appName, 'cnk') === '') $f = 0;
         if ($f < 2) {
@@ -196,7 +206,8 @@ class TalkIntegration
      * @param string $roomToken
      * @return string
      */
-    function getRoomURL(string $roomToken): string {
+    function getRoomURL(string $roomToken): string
+    {
         /** @type IURLGenerator $ug */
         $ug = \OC::$server->get(IURLGenerator::class);
         return $ug->getAbsoluteURL("index.php/call/" . $roomToken);
@@ -208,7 +219,8 @@ class TalkIntegration
      * @return string
      * @noinspection PhpDocMissingThrowsInspection
      */
-    private function formatDateTime(\Sabre\VObject\Property\ICalendar\DateTime $dateTime, string $userId): string {
+    private function formatDateTime(\Sabre\VObject\Property\ICalendar\DateTime $dateTime, string $userId): string
+    {
         if ($dateTime->isFloating()) {
             $this->logError("Talk room error: TalkIntegration - floating timezones are not supported");
             return "";
@@ -230,7 +242,8 @@ class TalkIntegration
     /**
      * @param string $token
      */
-    function deleteRoom(string $token) {
+    function deleteRoom(string $token)
+    {
         $tm = $this->getTalkManager();
         if ($tm !== null) {
             try {
@@ -245,7 +258,8 @@ class TalkIntegration
         }
     }
 
-    static public function canTalk(): bool {
+    static public function canTalk(): bool
+    {
         try {
             /** @type \OCA\Talk\Manager $tm */
             $tm = \OC::$server->get(\OCA\Talk\Manager::class);
@@ -259,7 +273,8 @@ class TalkIntegration
         }
     }
 
-    private function logError(string $msg) {
+    private function logError(string $msg)
+    {
         /** @var \Psr\Log\LoggerInterface $logger */
         $logger = \OC::$server->get(\Psr\Log\LoggerInterface::class);
         $logger->error($msg);

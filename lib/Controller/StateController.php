@@ -318,7 +318,7 @@ class StateController extends Controller
                         if ($this->setClsMps(
                             BackendUtils::KEY_CLS,
                             $this->utils->getDefaultForKey(BackendUtils::KEY_CLS),
-                            $calendarSettings, 'p0') === true) {
+                            json_encode($calendarSettings), 'p0') === true) {
                         $r->setStatus(200);
                         } else {
                             $r->setStatus(500);

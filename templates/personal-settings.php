@@ -60,6 +60,10 @@ style('appointments', 'settings'); // adds a CSS file
             <?php p($l->t('E-mail')); ?>
         </label>
         <input type="email" id="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" value="<?php p($_['email']) ?>" placeholder="<?php p($l->t('Your email address')); ?>" />
+        <label>
+            <?php p($l->t('E-mail')); ?>
+        </label>
+        <input type="number" id="prepTime" name="prepTime" required  value="<?php p($_['prepTime']) ?>" placeholder="<?php p($l->t('Your email address')); ?>" />
     </div>
 
 </div>

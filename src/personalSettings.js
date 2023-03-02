@@ -74,6 +74,7 @@ document.getElementById("appointments-save-settings").onclick = function () {
   const name = document.getElementById("name");
   const phone = document.getElementById("phone");
   const email = document.getElementById("email");
+  const prepTime = document.getElementById("prepTime");
 
   const savedLabel = document.getElementById("saved");
 
@@ -104,6 +105,7 @@ document.getElementById("appointments-save-settings").onclick = function () {
       a: "set_uci",
       d: `{\"organization\":\"${name.value}\",\"email\":\"${email.value}\",\"address\":\" \",\"phone\":\"${phone.value}\",\"confirmedRdrUrl\":\"\",\"confirmedRdrId\":false,\"confirmedRdrData\":false}`,
       p: "p0",
+      prepTime: prepTime.value,
     };
 
     $.post(OC.generateUrl("apps/appointments/state"), payload)

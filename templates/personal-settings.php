@@ -50,7 +50,7 @@ style('appointments', 'settings'); // adds a CSS file
             <?php p($l->t('Full Name')); ?>
         </label>
         <input type="text" id="name" name="name" required value="<?php p($_['name']) ?>" placeholder="<?php p($l->t('Your name')); ?>" autocomplete="on" autocapitalize="none" autocorrect="off" />
-       
+
         <label>
             <?php p($l->t('Phone Number')); ?>
         </label>
@@ -61,9 +61,22 @@ style('appointments', 'settings'); // adds a CSS file
         </label>
         <input type="email" id="email" name="email" required pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$" value="<?php p($_['email']) ?>" placeholder="<?php p($l->t('Your email address')); ?>" />
         <label>
-            <?php p($l->t('E-mail')); ?>
+            <?php p($l->t('Minimum lead time')); ?>
         </label>
-        <input type="number" id="prepTime" name="prepTime" required  value="<?php p($_['prepTime']) ?>" placeholder="<?php p($l->t('Your email address')); ?>" />
+        <!-- <input type="number" id="prepTime" name="prepTime" required value="<?php p($_['prepTime']) ?>" placeholder="<?php p($l->t('Minimum lead time')); ?>" /> -->
+        <select id="prepTime">
+            <option value="0" <?php if($_['prepTime']=="0") echo 'selected="selected"'; ?>>No lead time</option>
+            <option value="15" <?php if($_['prepTime']=="15") echo 'selected="selected"'; ?>>15 minutes</option>
+            <option value="30" <?php if($_['prepTime']=="30") echo 'selected="selected"'; ?>>30 minutes</option>
+            <option value="60" <?php if($_['prepTime']=="60") echo 'selected="selected"'; ?>>1 hour</option>
+            <option value="120" <?php if($_['prepTime']=="120") echo 'selected="selected"'; ?>>2 hours</option>
+            <option value="240" <?php if($_['prepTime']=="240") echo 'selected="selected"'; ?>>4 hours</option>
+            <option value="480" <?php if($_['prepTime']=="480") echo 'selected="selected"'; ?>>8 hours</option>
+            <option value="720" <?php if($_['prepTime']=="720") echo 'selected="selected"'; ?>>12 hours</option>
+            <option value="1440" <?php if($_['prepTime']=="1440") echo 'selected="selected"'; ?>>1 day</option>
+            <option value="2880" <?php if($_['prepTime']=="2880") echo 'selected="selected"'; ?>>2 days</option>
+            <option value="5760" <?php if($_['prepTime']=="5760") echo 'selected="selected"'; ?>>4 days</option>
+        </select>
     </div>
 
 </div>

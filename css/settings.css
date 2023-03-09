@@ -12,7 +12,7 @@
     flex-direction: row;
 }
 
-input{
+input, select{
     width: 200px;
 }
 

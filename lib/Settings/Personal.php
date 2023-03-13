@@ -60,6 +60,7 @@ class Personal implements ISettings
 	{
 		$formToken = $this->appointmentsUtils->getToken($this->userId);
 		$settings = $this->appointmentsUtils->getUserSettings('org_info',$this->userId);
+		$prepTime = $this->appointmentsUtils->getUserSettings('calendar_settings', $this->userId)['prepTime'];
 		$publicPageUrl = $this->urlGenerator->getBaseUrl() . "/apps/appointments/pub/" . $formToken . "/form";
 		$embedPageUrl = $this->urlGenerator->getBaseUrl() . "/apps/appointments/embed/" . $formToken . "/form";
 
@@ -69,7 +70,8 @@ class Personal implements ISettings
 			'embed-url' => $embedPageUrl,
 			'phone' => $settings['phone'],
 			'email'=> $settings['email'],
-			'name'=> $settings['organization']
+			'name'=> $settings['organization'],
+			'prepTime' => $prepTime
 		];
 		return new TemplateResponse($this->appName, 'personal-settings', $parameters, '');
 	}

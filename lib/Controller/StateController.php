@@ -303,15 +303,30 @@ class StateController extends Controller
             } else {
                 $r->setStatus(500);
             }
-        } else if ($action === "set_uci") {
+        } else if ($action === "set_uci") {            
+            $calendarSettings = $this->utils->getUserSettings(BackendUtils::KEY_CLS, $this->userId);
             $d = $this->request->getParam("d");
+            $prepTime = $this->request->getParam("prepTime");
             if ($d !== null && strlen($d) < 512) {
                 if ($this->utils->setUserSettings(
                         BackendUtils::KEY_ORG,
                         $d, $this->utils->getDefaultForKey(BackendUtils::KEY_ORG),
                         $this->userId, $this->appName) === true
                 ) {
-                    $r->setStatus(200);
+                    if($prepTime !== null){
+                        $calendarSettings['prepTime'] = $prepTime;
+                        if ($this->setClsMps(
+                            BackendUtils::KEY_CLS,
+                            $this->utils->getDefaultForKey(BackendUtils::KEY_CLS),
+                            json_encode($calendarSettings), 'p0') === true) {
+                        $r->setStatus(200);
+                        } else {
+                            $r->setStatus(500);
+                        }
+                    }
+                    else {
+                        $r->setStatus(200);
+                    }
                 } else {
                     $r->setStatus(500);
                 }

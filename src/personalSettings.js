@@ -75,6 +75,7 @@ document.getElementById("appointments-save-settings").onclick = function () {
   const phone = document.getElementById("phone");
   const email = document.getElementById("email");
   const prepTime = document.getElementById("prepTime");
+  const timezone = document.getElementById("timezoneSelector");
 
   const savedLabel = document.getElementById("saved");
 
@@ -106,6 +107,7 @@ document.getElementById("appointments-save-settings").onclick = function () {
       d: `{\"organization\":\"${name.value}\",\"email\":\"${email.value}\",\"address\":\" \",\"phone\":\"${phone.value}\",\"confirmedRdrUrl\":\"\",\"confirmedRdrId\":false,\"confirmedRdrData\":false}`,
       p: "p0",
       prepTime: prepTime.value,
+      timezone: timezone.value
     };
 
     $.post(OC.generateUrl("apps/appointments/state"), payload)

@@ -307,6 +307,7 @@ class StateController extends Controller
             $calendarSettings = $this->utils->getUserSettings(BackendUtils::KEY_CLS, $this->userId);
             $d = $this->request->getParam("d");
             $prepTime = $this->request->getParam("prepTime");
+            $timezone = $this->request->getParam("timezone");
             if ($d !== null && strlen($d) < 512) {
                 if ($this->utils->setUserSettings(
                         BackendUtils::KEY_ORG,
@@ -319,10 +320,16 @@ class StateController extends Controller
                             BackendUtils::KEY_CLS,
                             $this->utils->getDefaultForKey(BackendUtils::KEY_CLS),
                             json_encode($calendarSettings), 'p0') === true) {
-                        $r->setStatus(200);
+                            $r->setStatus(200);
                         } else {
                             $r->setStatus(500);
                         }
+                        if($timezone !== null){                            
+		                    $this->config->setUserValue($this->userId, $this->appName, "timezone", $timezone);
+                            $r->setStatus(200);
+                            } else {
+                                $r->setStatus(500);
+                            }
                     }
                     else {
                         $r->setStatus(200);

@@ -24,6 +24,7 @@ use Psr\Log\LoggerInterface;
 use Sabre\VObject\Reader;
 use OCP\Activity\IManager as IActivityManager;
 use DateTime;
+use DateTimeZone;
 use OCA\Adminly_Clients\Db\ClientMapper;
 use OCA\Adminly_Clients\Db\Client;
 
@@ -302,8 +303,8 @@ class DavListener implements IEventListener
                     try {
                         $mailer->send($msg);
 
-                        $utz = $this->utils->getCalendarTimezone($userId, $config, $bc->getCalendarById($calId, $userId));
-
+                        $utz = new DateTimeZone($this->config->getUserValue($userId, $this->appName, "timezone", 'UTC'));
+                        
                         if (!isset($evt->DESCRIPTION)) $evt->add('DESCRIPTION');
                         $description = $evt->DESCRIPTION->getValue();
                         // TRANSLATORS Ex: Reminder sent on {{Date and Time}},
@@ -455,7 +456,7 @@ class DavListener implements IEventListener
 
 //        \OC::$server->getLogger()->error('DL Debug: M7');
 
-        $utz = $utils->getCalendarTimezone($userId, $config, $utils->transformCalInfo($calendarData));
+        $utz = new DateTimeZone($this->config->getUserValue($userId, $this->appName, "timezone", 'UTC'));
         try {
             $now = new \DateTime('now', $utz);
         } catch (\Exception $e) {

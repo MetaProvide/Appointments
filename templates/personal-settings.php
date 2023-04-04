@@ -67,17 +67,67 @@ style('appointments', 'settings'); // adds a CSS file
     </div>
     <div class="form-col">
         <select id="prepTime">
-            <option value="0" <?php if ($_['prepTime'] == "0") echo 'selected="selected"'; ?>>No lead time</option>
-            <option value="15" <?php if ($_['prepTime'] == "15") echo 'selected="selected"'; ?>>15 minutes</option>
-            <option value="30" <?php if ($_['prepTime'] == "30") echo 'selected="selected"'; ?>>30 minutes</option>
-            <option value="60" <?php if ($_['prepTime'] == "60") echo 'selected="selected"'; ?>>1 hour</option>
-            <option value="120" <?php if ($_['prepTime'] == "120") echo 'selected="selected"'; ?>>2 hours</option>
-            <option value="240" <?php if ($_['prepTime'] == "240") echo 'selected="selected"'; ?>>4 hours</option>
-            <option value="480" <?php if ($_['prepTime'] == "480") echo 'selected="selected"'; ?>>8 hours</option>
-            <option value="720" <?php if ($_['prepTime'] == "720") echo 'selected="selected"'; ?>>12 hours</option>
-            <option value="1440" <?php if ($_['prepTime'] == "1440") echo 'selected="selected"'; ?>>1 day</option>
-            <option value="2880" <?php if ($_['prepTime'] == "2880") echo 'selected="selected"'; ?>>2 days</option>
-            <option value="5760" <?php if ($_['prepTime'] == "5760") echo 'selected="selected"'; ?>>4 days</option>
+            <?php
+            $options = array(
+                0 => 'No lead time',
+                15 => '15 minutes',
+                30 => '30 minutes',
+                60 => '1 hour',
+                120 => '2 hours',
+                240 => '4 hours',
+                480 => '8 hours',
+                720 => '12 hours',
+                1440 => '1 day',
+                2880 => '2 days',
+                5760 => '4 days'
+            );
+
+            $selected = $_['prepTime'];
+
+            foreach ($options as $value => $label) {
+                $isSelected = ($value == $selected) ? 'selected' : '';
+                echo "<option value=\"$value\" $isSelected>$label</option>";
+            }
+            ?>
+        </select>
+    </div>
+
+    <div class="title-subtitle">
+        <h2>
+            Timezone for email confirmations
+        </h2>
+    </div>
+    <div class="form-col">
+        <select id="timezoneSelector">
+            <?php
+            $timezone_identifiers = DateTimeZone::listIdentifiers();
+            $continents = array();
+            foreach ($timezone_identifiers as $timezone_identifier) {
+                $exploded = explode('/', $timezone_identifier, 2);
+                if (count($exploded) == 2) {
+                    $continent = $exploded[0];
+                    $timezone = $exploded[1];
+                    if (!isset($continents[$continent])) {
+                        $continents[$continent] = array();
+                    }
+                    $continents[$continent][] = $timezone_identifier;
+                }
+            }
+            echo '<option value="UTC" ' . ($_['timezone'] == 'UTC' ? 'selected' : '') . '>UTC</option>';
+            ksort($continents);
+            foreach ($continents as $continent => $timezones) {
+                echo '<optgroup label="' . $continent . '">';
+                sort($timezones);
+                foreach ($timezones as $timezone_identifier) {
+                    $timezone = new DateTimeZone($timezone_identifier);
+                    $timezone_name = str_replace($continent . '/', '', $timezone_identifier);
+                    $timezone_name = str_replace('_', ' ', $timezone_name);
+                    $selected = $timezone_identifier == $_['timezone'] ? 'selected' : '';
+                    echo '<option value="' . $timezone_identifier . '" ' . $selected . '>' . $timezone_name . '</option>';
+                }
+                echo '</optgroup>';
+            }
+            ?>
         </select>
     </div>
 

@@ -63,6 +63,7 @@ class Personal implements ISettings
 		$prepTime = $this->appointmentsUtils->getUserSettings('calendar_settings', $this->userId)['prepTime'];
 		$publicPageUrl = $this->urlGenerator->getBaseUrl() . "/apps/appointments/pub/" . $formToken . "/form";
 		$embedPageUrl = $this->urlGenerator->getBaseUrl() . "/apps/appointments/embed/" . $formToken . "/form";
+		$timezone = $this->config->getUserValue($this->userId, $this->appName, "timezone", 'UTC');
 
 		//$lastSentReportTime = $this->config->getAppValue($this->appName, 'org-name', 0);
 		$parameters = [
@@ -71,7 +72,8 @@ class Personal implements ISettings
 			'phone' => $settings['phone'],
 			'email'=> $settings['email'],
 			'name'=> $settings['organization'],
-			'prepTime' => $prepTime
+			'prepTime' => $prepTime,
+			'timezone' => $timezone
 		];
 		return new TemplateResponse($this->appName, 'personal-settings', $parameters, '');
 	}

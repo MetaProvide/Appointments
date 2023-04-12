@@ -89,17 +89,23 @@ class Provider implements IProvider
 			$event->setIcon($this->url->getAbsoluteURL($this->url->imagePath('/custom_apps/appointments/', 'app-dark.svg')));
 		}
 
-		if ($event->getSubject() === self::SUBJECT_ADD) {
-			$subject = $this->l->t('{booking} has created a new booking for {dtStart}');
-		} elseif ($event->getSubject() === self::SUBJECT_CONFIRM) {
-			$subject = $this->l->t('{booking} has confirmed a booking for {dtStart}');
-		} elseif ($event->getSubject() === self::SUBJECT_CANCEL) {
-			$subject = $this->l->t('{booking} has cancelled a booking for {dtStart}');
-		} elseif ($event->getSubject() === self::SUBJECT_OTHER) {
-			$subject = $this->l->t('Booking for {booking} at {dtStart} has been modified');
-		} else {
-			throw new \InvalidArgumentException();
+		switch ($event->getSubject()) {
+			case self::SUBJECT_ADD:
+				$subject = $this->l->t('{booking} has created a new booking for {dtStart}');
+				break;
+			case self::SUBJECT_CONFIRM:
+				$subject = $this->l->t('{booking} has confirmed a booking for {dtStart}');
+				break;
+			case self::SUBJECT_CANCEL:
+				$subject = $this->l->t('{booking} has cancelled a booking for {dtStart}');
+				break;
+			case self::SUBJECT_OTHER:
+				$subject = $this->l->t('Booking for {booking} at {dtStart} has been modified');
+				break;
+			default:
+				throw new \InvalidArgumentException();
 		}
+		
 
 		$this->setSubjects($event, $subject, $subjectParameters);
 

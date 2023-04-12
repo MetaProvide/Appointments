@@ -1280,7 +1280,7 @@ class DavListener implements IEventListener
 					'dtStart' => [
                         'type' => 'calendar',
                         'id' => $object['dtStart'],
-                        'name' =>  $dtStart->format('Y-m-d H:i'),
+                        'name' =>  $dtStart->format('Y-m-d H:i T'),
                     ],				
                     'booking' => [
                         'type' => 'calendar-event',

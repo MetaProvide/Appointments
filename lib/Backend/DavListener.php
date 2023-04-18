@@ -1281,7 +1281,7 @@ class DavListener implements IEventListener
 					'dtStart' => [
                         'type' => 'calendar',
                         'id' => $object['dtStart'],
-                        'name' =>  $dtStart->format('Y-m-d H:i'),
+                        'name' =>  $dtStart->format('Y-m-d H:i e'),
                     ],				
                     'booking' => [
                         'type' => 'calendar-event',
@@ -1316,9 +1316,9 @@ class DavListener implements IEventListener
         }
 
         if ($componentType === 'VEVENT') {
-            return ['id' => (string) $component->UID, 'name' => (string) $component->SUMMARY, 'dtStart' => (string) $component->DTSTART, 'type' => 'event'];
+            return ['id' => (string) $component->UID, 'name' => (string) $component->SUMMARY, 'dtStart' => $component->DTSTART->getDateTime()->format('Y-m-d H:i e'), 'type' => 'event'];
         }
-        return ['id' => (string) $component->UID, 'name' => (string) $component->SUMMARY, 'dtStart' => (string) $component->DTSTART, 'type' => 'todo', 'status' => (string) $component->STATUS];
+        return ['id' => (string) $component->UID, 'name' => (string) $component->SUMMARY, 'dtStart' => $component->DTSTART->getDateTime()->format('Y-m-d H:i e'), 'type' => 'todo', 'status' => (string) $component->STATUS];
     }
 
     /**
